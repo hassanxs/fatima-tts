@@ -1,0 +1,324 @@
+<Page x:Class="FatimaTTS.Views.VoiceDesignPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="{DynamicResource BgContentBrush}"
+      FontFamily="Segoe UI">
+
+    <DockPanel>
+
+        <!-- Header -->
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource BgContentBrush}"
+                Padding="28,22,28,16"
+                BorderBrush="{DynamicResource BorderSubtleBrush}"
+                BorderThickness="0,0,0,1">
+            <StackPanel>
+                <TextBlock Text="Voice Design"
+                           FontSize="22" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+                <TextBlock Text="Describe a voice in words — Inworld AI generates it for you"
+                           Style="{StaticResource TextSecondary}" Margin="0,4,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <Grid Margin="28,20,28,28">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="300"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Left: Design form + Previews -->
+                <StackPanel Grid.Column="0">
+
+                    <!-- Step 1: Describe -->
+                    <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16" Padding="20">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                <Border Width="22" Height="22" CornerRadius="11"
+                                        Background="{DynamicResource AccentBrush}"
+                                        Margin="0,0,10,0">
+                                    <TextBlock Text="1" FontSize="11" FontWeight="Bold"
+                                               Foreground="White"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Text="Describe your voice"
+                                           FontSize="14" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <TextBlock Text="VOICE DESCRIPTION" Style="{StaticResource SectionLabel}"/>
+                            <TextBox x:Name="DesignPromptBox"
+                                     Style="{StaticResource InputStyle}"
+                                     Height="80" AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     Tag="e.g. Warm, friendly female voice with a slight Southern accent, natural pacing, clear articulation — great for audiobooks and storytelling."
+                                     Margin="0,0,0,16"/>
+
+                            <TextBlock Text="PREVIEW TEXT" Style="{StaticResource SectionLabel}"/>
+                            <TextBlock Text="Short text for the AI to speak when generating previews (50–200 characters)."
+                                       Style="{StaticResource TextMuted}" Margin="0,0,0,6"
+                                       TextWrapping="Wrap"/>
+                            <TextBox x:Name="PreviewTextBox"
+                                     Style="{StaticResource InputStyle}"
+                                     Height="60" AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     Tag="Hey! I'm here. What can I help you with today? I'd be happy to assist with whatever you need."
+                                     Margin="0,0,0,16"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="LANGUAGE" Style="{StaticResource SectionLabel}"/>
+                                    <ComboBox x:Name="LanguageComboBox"
+                                              Style="{StaticResource ComboStyle}" Height="36">
+                                        <ComboBoxItem Content="🇺🇸 English (US)"   Tag="EN_US" IsSelected="True"/>
+                                        <ComboBoxItem Content="🇪🇸 Spanish (Spain)" Tag="ES_ES"/>
+                                        <ComboBoxItem Content="🇧🇷 Portuguese (BR)" Tag="PT_BR"/>
+                                        <ComboBoxItem Content="🇫🇷 French"          Tag="FR_FR"/>
+                                        <ComboBoxItem Content="🇩🇪 German"          Tag="DE_DE"/>
+                                        <ComboBoxItem Content="🇮🇹 Italian"         Tag="IT_IT"/>
+                                        <ComboBoxItem Content="🇯🇵 Japanese"        Tag="JA_JP"/>
+                                        <ComboBoxItem Content="🇰🇷 Korean"          Tag="KO_KR"/>
+                                        <ComboBoxItem Content="🇨🇳 Chinese"         Tag="ZH_CN"/>
+                                        <ComboBoxItem Content="🇷🇺 Russian"         Tag="RU_RU"/>
+                                        <ComboBoxItem Content="🇳🇱 Dutch"           Tag="NL_NL"/>
+                                        <ComboBoxItem Content="🇵🇱 Polish"          Tag="PL_PL"/>
+                                        <ComboBoxItem Content="🇮🇳 Hindi"           Tag="HI_IN"/>
+                                        <ComboBoxItem Content="🇸🇦 Arabic"          Tag="AR_SA"/>
+                                        <ComboBoxItem Content="🇮🇱 Hebrew"          Tag="HE_IL"/>
+                                        <ComboBoxItem Content="🌐 Auto-detect"     Tag="AUTO"/>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2" VerticalAlignment="Bottom">
+                                    <TextBlock Text="SAMPLES (1–3)" Style="{StaticResource SectionLabel}"/>
+                                    <ComboBox x:Name="SamplesComboBox"
+                                              Style="{StaticResource ComboStyle}"
+                                              Height="36" Width="120">
+                                        <ComboBoxItem Content="1 sample"  Tag="1"/>
+                                        <ComboBoxItem Content="2 samples" Tag="2"/>
+                                        <ComboBoxItem Content="3 samples" Tag="3" IsSelected="True"/>
+                                    </ComboBox>
+                                </StackPanel>
+                            </Grid>
+
+                            <Button x:Name="GenerateButton"
+                                    Style="{StaticResource CtaButtonStyle}"
+                                    Height="44" Margin="0,20,0,0"
+                                    Click="GenerateButton_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="✦  Generate Previews" FontSize="14" Foreground="White"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Generating indicator -->
+                            <Border x:Name="GeneratingPanel" Visibility="Collapsed" Margin="0,14,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock x:Name="GeneratingText"
+                                               Text="Generating voice previews…"
+                                               Style="{StaticResource TextSecondary}"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Step 2: Pick a preview -->
+                    <Border x:Name="PreviewsPanel"
+                            Visibility="Collapsed"
+                            Style="{StaticResource CardStyle}" Margin="0,0,0,16" Padding="20">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                <Border Width="22" Height="22" CornerRadius="11"
+                                        Background="{DynamicResource AccentBrush}"
+                                        Margin="0,0,10,0">
+                                    <TextBlock Text="2" FontSize="11" FontWeight="Bold"
+                                               Foreground="White"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Text="Listen and choose a preview"
+                                           FontSize="14" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <ItemsControl x:Name="PreviewsList">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{DynamicResource BgInputBrush}"
+                                                BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="8"
+                                                Padding="14,12"
+                                                Margin="0,0,0,10"
+                                                Cursor="Hand"
+                                                Tag="{Binding VoiceId}"
+                                                MouseLeftButtonDown="PreviewItem_Select">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <!-- Selection indicator -->
+                                                <Border x:Name="SelectDot"
+                                                        Grid.Column="0"
+                                                        Width="18" Height="18"
+                                                        CornerRadius="9"
+                                                        BorderBrush="{DynamicResource BorderDefaultBrush}"
+                                                        BorderThickness="1.5"
+                                                        Margin="0,0,12,0"
+                                                        VerticalAlignment="Center">
+                                                    <Border x:Name="SelectFill"
+                                                            Width="10" Height="10"
+                                                            CornerRadius="5"
+                                                            Background="{DynamicResource AccentBrush}"
+                                                            Visibility="{Binding IsSelectedVisibility}"/>
+                                                </Border>
+                                                <!-- Label -->
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Label}"
+                                                               FontSize="13" FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                    <TextBlock Text="{Binding VoiceId}"
+                                                               Style="{StaticResource TextMuted}"
+                                                               Margin="0,2,0,0"/>
+                                                </StackPanel>
+                                                <!-- Play button -->
+                                                <Button Grid.Column="2"
+                                                        Style="{StaticResource SecondaryButtonStyle}"
+                                                        Height="32" Padding="12,0"
+                                                        Tag="{Binding VoiceId}"
+                                                        Click="PlayPreview_Click">
+                                                    <TextBlock Text="▶  Play" FontSize="11"/>
+                                                </Button>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Step 3: Publish -->
+                    <Border x:Name="PublishPanel"
+                            Visibility="Collapsed"
+                            Style="{StaticResource CardStyle}" Padding="20">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                <Border Width="22" Height="22" CornerRadius="11"
+                                        Background="{DynamicResource AccentBrush}"
+                                        Margin="0,0,10,0">
+                                    <TextBlock Text="3" FontSize="11" FontWeight="Bold"
+                                               Foreground="White"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Text="Name and publish your voice"
+                                           FontSize="14" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <TextBlock Text="VOICE NAME" Style="{StaticResource SectionLabel}"/>
+                            <TextBox x:Name="VoiceNameBox"
+                                     Style="{StaticResource InputStyle}"
+                                     Height="36"
+                                     Tag="e.g. Aria, Narrator, Customer Support Bot"
+                                     Margin="0,0,0,14"/>
+
+                            <TextBlock Text="DESCRIPTION (OPTIONAL)" Style="{StaticResource SectionLabel}"/>
+                            <TextBox x:Name="DescriptionBox"
+                                     Style="{StaticResource InputStyle}"
+                                     Height="56" AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     Tag="Brief description of this voice's character and use case…"
+                                     Margin="0,0,0,20"/>
+
+                            <Button x:Name="PublishButton"
+                                    Style="{StaticResource CtaButtonStyle}"
+                                    Height="44"
+                                    Click="PublishButton_Click">
+                                <TextBlock Text="✦  Publish to Voice Library"
+                                           FontSize="14" Foreground="White"/>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+
+                <!-- Right: Tips -->
+                <StackPanel Grid.Column="2">
+                    <Border Style="{StaticResource CardStyle}" Padding="18">
+                        <StackPanel>
+                            <TextBlock Text="✦  PROMPT TIPS"
+                                       Style="{StaticResource SectionLabel}"
+                                       Margin="0,0,0,10"/>
+
+                            <TextBlock Text="Include these attributes for best results:"
+                                       Style="{StaticResource TextSecondary}"
+                                       TextWrapping="Wrap" Margin="0,0,0,10"/>
+
+                            <StackPanel Margin="0,0,0,6">
+                                <TextBlock Text="🎭  Age &amp; Gender"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Young woman, middle-aged man, elderly…"
+                                           Style="{StaticResource TextMuted}"
+                                           TextWrapping="Wrap" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,0,6">
+                                <TextBlock Text="🌍  Accent"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                <TextBlock Text="British RP, Southern US, neutral American…"
+                                           Style="{StaticResource TextMuted}"
+                                           TextWrapping="Wrap" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,0,6">
+                                <TextBlock Text="🎵  Pitch &amp; Pace"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Low and deep, bright and airy, steady pace…"
+                                           Style="{StaticResource TextMuted}"
+                                           TextWrapping="Wrap" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,0,6">
+                                <TextBlock Text="💡  Tone &amp; Use Case"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Warm and conversational for podcasts, authoritative for narration…"
+                                           Style="{StaticResource TextMuted}"
+                                           TextWrapping="Wrap" Margin="0,2,0,0"/>
+                            </StackPanel>
+
+                            <Separator Style="{StaticResource HorizontalSeparator}" Margin="0,12"/>
+
+                            <TextBlock Text="💡  EXAMPLE"
+                                       Style="{StaticResource SectionLabel}"
+                                       Margin="0,0,0,8"/>
+                            <Border Background="{DynamicResource BgInputBrush}"
+                                    CornerRadius="6" Padding="12">
+                                <TextBlock TextWrapping="Wrap" FontSize="11" FontStyle="Italic"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Text="&quot;Warm, friendly female voice in her 30s with a subtle smile. Natural conversational pacing. Clear articulation, slight Southern US accent. Perfect for podcasts and audiobooks.&quot;"/>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+            </Grid>
+        </ScrollViewer>
+
+    </DockPanel>
+</Page>

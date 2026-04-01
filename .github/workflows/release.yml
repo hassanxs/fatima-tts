@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'          # triggers on v1.0.0, v1.2.3, etc.
+  workflow_dispatch:       # manual trigger from GitHub UI
+
+permissions:
+  contents: write          # needed to create GitHub Releases
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore FatimaTTS/FatimaTTS.csproj
+
+      - name: Build & Publish (self-contained exe)
+        run: |
+          dotnet publish FatimaTTS/FatimaTTS.csproj `
+            -c Release `
+            -r win-x64 `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -p:EnableCompressionInSingleFile=true `
+            -o publish/
+
+      - name: Rename output
+        run: |
+          $tag = "${{ github.ref_name }}"
+          Rename-Item publish\FatimaTTS.exe "FatimaTTS-$tag-win-x64.exe"
+
+      - name: Build MSI installer (WiX)
+        run: |
+          dotnet tool install --global wix
+          cd installer
+          wix build FatimaTTS.wxs -o "FatimaTTS-${{ github.ref_name }}-installer.msi"
+        continue-on-error: true    # MSI is optional — won't fail the release
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Fatima TTS ${{ github.ref_name }}"
+          body_path: CHANGELOG.md
+          files: |
+            FatimaTTS-${{ github.ref_name }}-win-x64.exe
+            installer/FatimaTTS-${{ github.ref_name }}-installer.msi
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,309 @@
+<Page x:Class="FatimaTTS.Views.SettingsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="{DynamicResource BgContentBrush}"
+      FontFamily="Segoe UI">
+
+    <DockPanel>
+
+        <!-- Header -->
+        <Border DockPanel.Dock="Top"
+                Padding="24,18,24,14"
+                BorderBrush="{DynamicResource BorderSubtleBrush}"
+                BorderThickness="0,0,0,1">
+            <TextBlock Text="Settings"
+                       FontSize="18" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+        </Border>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="24,20,24,40" MaxWidth="600">
+
+                <!-- ── API Key ── -->
+                <TextBlock Text="API CONFIGURATION" Style="{StaticResource SectionLabel}"/>
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20" Padding="16">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,8">
+                            <TextBlock Text="Inworld API Key"
+                                       FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}"
+                                       VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Ellipse x:Name="ApiDot" Width="8" Height="8"
+                                         Fill="{DynamicResource DangerBrush}"
+                                         VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBlock x:Name="ApiKeyStatus"
+                                           Text="Not configured"
+                                           Style="{StaticResource TextMuted}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="Your API key is stored securely in Windows Credential Manager and never written to disk in plaintext."
+                                   Style="{StaticResource TextMuted}"
+                                   TextWrapping="Wrap" Margin="0,0,0,10"/>
+
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <PasswordBox x:Name="ApiKeyBox"
+                                         Grid.Column="0"
+                                         Height="36"
+                                         Padding="10,0"
+                                         Background="{DynamicResource BgInputBrush}"
+                                         Foreground="{DynamicResource TextPrimaryBrush}"
+                                         BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                         PasswordChar="●"
+                                         FontFamily="Segoe UI"
+                                         FontSize="13"/>
+                            <Button x:Name="SaveApiKeyButton"
+                                    Grid.Column="1"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Click="SaveApiKeyButton_Click"
+                                    Margin="8,0,0,0" Height="36" Padding="14,0">
+                                <TextBlock Text="Save Key" FontSize="12"/>
+                            </Button>
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="ValidateKeyButton"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Click="ValidateKeyButton_Click"
+                                    Height="30" Padding="12,0">
+                                <TextBlock Text="✓  Validate Key" FontSize="11"/>
+                            </Button>
+                            <Button x:Name="DeleteKeyButton"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Click="DeleteKeyButton_Click"
+                                    Height="30" Padding="12,0" Margin="8,0,0,0"
+                                    Foreground="{DynamicResource DangerBrush}">
+                                <TextBlock Text="✕  Remove Key" FontSize="11"/>
+                            </Button>
+                            <TextBlock x:Name="ValidationResultText"
+                                       Style="{StaticResource TextMuted}"
+                                       VerticalAlignment="Center"
+                                       Margin="12,0,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- ── Appearance ── -->
+                <TextBlock Text="APPEARANCE" Style="{StaticResource SectionLabel}"/>
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20" Padding="16">
+                    <StackPanel>
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="Theme"
+                                           FontSize="13" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Your preference is saved and applied on next launch"
+                                           Style="{StaticResource TextMuted}"
+                                           Margin="0,3,0,0"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <RadioButton x:Name="ThemeDark"
+                                             Content="Dark" GroupName="ThemeGroup"
+                                             Foreground="{DynamicResource TextSecondaryBrush}"
+                                             FontSize="12" IsChecked="True"
+                                             Checked="ThemeDark_Checked"
+                                             Margin="0,0,16,0"/>
+                                <RadioButton x:Name="ThemeLight"
+                                             Content="Light" GroupName="ThemeGroup"
+                                             Foreground="{DynamicResource TextSecondaryBrush}"
+                                             FontSize="12"
+                                             Checked="ThemeLight_Checked"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ── Output ── -->
+                <TextBlock Text="OUTPUT" Style="{StaticResource SectionLabel}"/>
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20" Padding="16">
+                    <StackPanel>
+
+                        <TextBlock Text="Default Format"
+                                   FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   Margin="0,0,0,6"/>
+                        <ComboBox x:Name="DefaultFormatCombo"
+                                  Style="{StaticResource ComboStyle}"
+                                  Margin="0,0,0,14"/>
+
+                        <TextBlock Text="Output Folder"
+                                   FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   Margin="0,0,0,6"/>
+                        <TextBlock Text="Completed audio files will automatically be copied here"
+                                   Style="{StaticResource TextMuted}"
+                                   Margin="0,0,0,8"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <Border Background="{DynamicResource BgInputBrush}"
+                                        BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                        BorderThickness="1" CornerRadius="6"
+                                        Height="36">
+                                    <TextBlock x:Name="OutputFolderBox"
+                                               Foreground="{DynamicResource TextPrimaryBrush}"
+                                               FontSize="13" FontFamily="Segoe UI"
+                                               VerticalAlignment="Center"
+                                               Padding="10,0"
+                                               Margin="10,0"
+                                               TextTrimming="CharacterEllipsis"/>
+                                </Border>
+                                <TextBlock x:Name="FolderPlaceholder"
+                                           Text="No folder selected — click Browse…"
+                                           FontSize="13"
+                                           Foreground="{DynamicResource TextMutedBrush}"
+                                           VerticalAlignment="Center"
+                                           Margin="22,0,0,0"
+                                           IsHitTestVisible="False"
+                                           Visibility="Visible"/>
+                            </Grid>
+                            <Button x:Name="BrowseFolderButton"
+                                    Grid.Column="1"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Click="BrowseFolderButton_Click"
+                                    Margin="8,0,0,0" Height="36" Padding="14,0">
+                                <TextBlock Text="Browse…" FontSize="12"/>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ── Defaults ── -->
+                <TextBlock Text="GENERATION DEFAULTS" Style="{StaticResource SectionLabel}"/>
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20" Padding="16">
+                    <StackPanel>
+
+                        <TextBlock Text="Default Model"
+                                   FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   Margin="0,0,0,6"/>
+                        <ComboBox x:Name="DefaultModelCombo"
+                                  Style="{StaticResource ComboStyle}"
+                                  Margin="0,0,0,14"/>
+
+                        <Grid Margin="0,0,0,4">
+                            <TextBlock Text="Default Temperature"
+                                       FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock x:Name="DefaultTempValue"
+                                       Style="{StaticResource TextSecondary}"
+                                       HorizontalAlignment="Right"/>
+                        </Grid>
+                        <Slider x:Name="DefaultTempSlider"
+                                Minimum="0.1" Maximum="2.0" Value="1.1"
+                                TickFrequency="0.1" IsSnapToTickEnabled="True"
+                                Margin="0,0,0,14"
+                                ValueChanged="DefaultTempSlider_ValueChanged"/>
+
+                        <Grid Margin="0,0,0,4">
+                            <TextBlock Text="Default Speaking Rate"
+                                       FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock x:Name="DefaultRateValue"
+                                       Style="{StaticResource TextSecondary}"
+                                       HorizontalAlignment="Right"/>
+                        </Grid>
+                        <Slider x:Name="DefaultRateSlider"
+                                Minimum="0.5" Maximum="1.5" Value="1.0"
+                                TickFrequency="0.1" IsSnapToTickEnabled="True"
+                                ValueChanged="DefaultRateSlider_ValueChanged"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- ── FFmpeg ── -->
+                <TextBlock Text="FFMPEG" Style="{StaticResource SectionLabel}"/>
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20" Padding="16">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,10">
+                            <StackPanel>
+                                <TextBlock Text="FFmpeg for Batch Merge"
+                                           FontSize="13" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                <TextBlock x:Name="FfmpegStatusText"
+                                           Text="Checking…"
+                                           Style="{StaticResource TextSecondary}"
+                                           Margin="0,3,0,0"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                                        VerticalAlignment="Center">
+                                <Button x:Name="FfmpegDownloadButton"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Height="32" Padding="12,0"
+                                        Click="FfmpegDownload_Click">
+                                    <TextBlock Text="↓  Install FFmpeg" FontSize="11"/>
+                                </Button>
+                                <Button x:Name="FfmpegUpdateButton"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Height="32" Padding="12,0" Margin="8,0,0,0"
+                                        Visibility="Collapsed"
+                                        Click="FfmpegUpdate_Click">
+                                    <TextBlock Text="↑  Check for Update" FontSize="11"/>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                        <!-- Download progress -->
+                        <Border x:Name="FfmpegProgressPanel" Visibility="Collapsed">
+                            <StackPanel>
+                                <TextBlock x:Name="FfmpegProgressText"
+                                           Style="{StaticResource TextSecondary}"
+                                           Margin="0,0,0,4"/>
+                                <ProgressBar x:Name="FfmpegProgressBar"
+                                             Height="4" Minimum="0" Maximum="100"
+                                             Foreground="{DynamicResource AccentBrush}"
+                                             Background="{DynamicResource BorderSubtleBrush}"
+                                             BorderThickness="0"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- ── Logs ── -->
+                <TextBlock Text="LOGS" Style="{StaticResource SectionLabel}"/>
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20" Padding="16">
+                    <Grid>
+                        <StackPanel>
+                            <TextBlock Text="Application Logs"
+                                       FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock x:Name="LogPathText"
+                                       Style="{StaticResource TextSecondary}"
+                                       Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                        <Button Style="{StaticResource SecondaryButtonStyle}"
+                                HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Height="32" Padding="12,0"
+                                Click="OpenLogsFolder_Click">
+                            <TextBlock Text="📁  Open Folder" FontSize="11"/>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- Save button -->
+                <Button x:Name="SaveSettingsButton"
+                        Style="{StaticResource CtaButtonStyle}"
+                        Click="SaveSettingsButton_Click"
+                        Height="44"
+                        Content="Save Settings"/>
+
+                <TextBlock x:Name="SavedConfirmText"
+                           Text="✓  Settings saved"
+                           Style="{StaticResource TextMuted}"
+                           Foreground="{DynamicResource SuccessBrush}"
+                           HorizontalAlignment="Center"
+                           Margin="0,10,0,0"
+                           Visibility="Collapsed"/>
+
+            </StackPanel>
+        </ScrollViewer>
+
+    </DockPanel>
+</Page>

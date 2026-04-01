@@ -1,0 +1,393 @@
+<Page x:Class="FatimaTTS.Views.MyJobsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="{DynamicResource BgContentBrush}"
+      FontFamily="Segoe UI">
+
+    <Page.Resources>
+        <!-- Filter pill style for status radio buttons -->
+        <Style x:Key="FilterPillStyle" TargetType="RadioButton">
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="BorderBrush"     Value="{DynamicResource BorderDefaultBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground"      Value="{DynamicResource TextSecondaryBrush}"/>
+            <Setter Property="FontFamily"      Value="Segoe UI"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="Padding"         Value="12,5"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="14"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background"   Value="{DynamicResource AccentBrush}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush"  Value="{DynamicResource AccentBrush}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BgHoverBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <DockPanel>
+
+        <!-- Header -->
+        <Border DockPanel.Dock="Top"
+                Padding="24,18,24,14"
+                BorderBrush="{DynamicResource BorderSubtleBrush}"
+                BorderThickness="0,0,0,1">
+            <Grid>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="My Jobs" FontSize="18" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBlock x:Name="JobCountText" Text="Loading…"
+                               Style="{StaticResource TextMuted}" Margin="0,3,0,0"/>
+                </StackPanel>
+                <Button x:Name="NewJobButton"
+                        HorizontalAlignment="Right" VerticalAlignment="Center"
+                        Style="{StaticResource CtaButtonStyle}"
+                        Click="NewJobButton_Click"
+                        Height="38" Width="120" FontSize="13"
+                        Content="+ New Job"/>
+            </Grid>
+        </Border>
+
+        <!-- Stats strip -->
+        <Border DockPanel.Dock="Top"
+                Padding="24,12"
+                BorderBrush="{DynamicResource BorderSubtleBrush}"
+                BorderThickness="0,0,0,1"
+                Background="{DynamicResource BgSidebarBrush}">
+            <StackPanel Orientation="Horizontal">
+                <Border Style="{StaticResource CardStyle}" Padding="16,10" Margin="0,0,10,0" MinWidth="110">
+                    <StackPanel>
+                        <TextBlock x:Name="StatTotal" Text="0" FontSize="22" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="Total" Style="{StaticResource TextMuted}" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource CardStyle}" Padding="16,10" Margin="0,0,10,0" MinWidth="110">
+                    <StackPanel>
+                        <TextBlock x:Name="StatCompleted" Text="0" FontSize="22" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource SuccessBrush}"/>
+                        <TextBlock Text="Completed" Style="{StaticResource TextMuted}" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource CardStyle}" Padding="16,10" Margin="0,0,10,0" MinWidth="110">
+                    <StackPanel>
+                        <TextBlock x:Name="StatFailed" Text="0" FontSize="22" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource DangerBrush}"/>
+                        <TextBlock Text="Failed" Style="{StaticResource TextMuted}" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource CardStyle}" Padding="16,10" MinWidth="110">
+                    <StackPanel>
+                        <TextBlock x:Name="StatInterrupted" Text="0" FontSize="22" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource WarningBrush}"/>
+                        <TextBlock Text="Interrupted" Style="{StaticResource TextMuted}" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <!-- Search + filter strip -->
+        <Border DockPanel.Dock="Top"
+                Padding="24,10"
+                BorderBrush="{DynamicResource BorderSubtleBrush}"
+                BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Search box -->
+                <Border Grid.Column="0"
+                        Background="{DynamicResource BgInputBrush}"
+                        BorderBrush="{DynamicResource BorderSubtleBrush}"
+                        BorderThickness="1" CornerRadius="6"
+                        Height="34" MaxWidth="360" HorizontalAlignment="Left">
+                    <Grid>
+                        <TextBlock Text="🔍" FontSize="11"
+                                   Foreground="{DynamicResource TextMutedBrush}"
+                                   VerticalAlignment="Center" Margin="10,0"/>
+                        <TextBox x:Name="SearchBox"
+                                 Background="Transparent" BorderThickness="0"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"
+                                 FontSize="13"
+                                 Padding="28,0,10,0"
+                                 TextChanged="SearchBox_TextChanged"/>
+                        <TextBlock x:Name="SearchPlaceholder"
+                                   Text="Search by title or voice…" FontSize="13"
+                                   Foreground="{DynamicResource TextMutedBrush}"
+                                   VerticalAlignment="Center" Margin="30,0,0,0"
+                                   IsHitTestVisible="False" Visibility="Visible"/>
+                    </Grid>
+                </Border>
+
+                <!-- Status filter pills -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <RadioButton x:Name="FilterAll"         Content="All"
+                                 GroupName="JobFilter" IsChecked="True"
+                                 Style="{StaticResource FilterPillStyle}"
+                                 Checked="Filter_Checked"/>
+                    <RadioButton x:Name="FilterCompleted"   Content="Completed"
+                                 GroupName="JobFilter"
+                                 Style="{StaticResource FilterPillStyle}" Margin="6,0,0,0"
+                                 Checked="Filter_Checked"/>
+                    <RadioButton x:Name="FilterFailed"      Content="Failed"
+                                 GroupName="JobFilter"
+                                 Style="{StaticResource FilterPillStyle}" Margin="6,0,0,0"
+                                 Checked="Filter_Checked"/>
+                    <RadioButton x:Name="FilterInterrupted" Content="Interrupted"
+                                 GroupName="JobFilter"
+                                 Style="{StaticResource FilterPillStyle}" Margin="6,0,0,0"
+                                 Checked="Filter_Checked"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Empty state -->
+        <Border x:Name="EmptyPanel" DockPanel.Dock="Top"
+                Padding="24,60" Visibility="Collapsed">
+            <StackPanel HorizontalAlignment="Center">
+                <TextBlock Text="📋" FontSize="40" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                <TextBlock x:Name="EmptyText" Text="No jobs yet" FontSize="16" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                <TextBlock x:Name="EmptySubText" Text="Generate your first speech to see jobs here."
+                           Style="{StaticResource TextMuted}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Player bar docked to bottom — MUST be before the fill ScrollViewer -->
+        <Border x:Name="PlayerBar"
+                DockPanel.Dock="Bottom"
+                Visibility="Collapsed"
+                Background="{DynamicResource BgCardBrush}"
+                BorderBrush="{DynamicResource BorderSubtleBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="20,12,20,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <!-- Track info + waveform -->
+                    <ColumnDefinition Width="*"/>
+                    <!-- Transport controls -->
+                    <ColumnDefinition Width="Auto"/>
+                    <!-- Actions -->
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Left: title, waveform, seekbar, timestamps -->
+                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,24,0">
+                    <TextBlock x:Name="PlayerTitle"
+                               FontSize="12" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               TextTrimming="CharacterEllipsis"
+                               Margin="0,0,0,6"/>
+                    <!-- Waveform -->
+                    <Border Background="{DynamicResource BgInputBrush}"
+                            CornerRadius="4" Height="36"
+                            ClipToBounds="True" Cursor="Hand"
+                            MouseLeftButtonDown="PlayerProgressTrack_Click">
+                        <Grid>
+                            <Canvas x:Name="PlayerWaveformCanvas"/>
+                            <!-- Playhead overlay -->
+                            <Border x:Name="PlayerProgressFill"
+                                    Background="{DynamicResource AccentBrush}"
+                                    Opacity="0.2"
+                                    HorizontalAlignment="Left"
+                                    Width="0"/>
+                        </Grid>
+                    </Border>
+                    <!-- Time row -->
+                    <Grid Margin="0,4,0,0">
+                        <TextBlock x:Name="PlayerPosition"
+                                   Text="0:00" FontSize="10"
+                                   Foreground="{DynamicResource TextMutedBrush}"
+                                   HorizontalAlignment="Left"/>
+                        <TextBlock x:Name="PlayerDuration"
+                                   Text="0:00" FontSize="10"
+                                   Foreground="{DynamicResource TextMutedBrush}"
+                                   HorizontalAlignment="Right"/>
+                    </Grid>
+                </StackPanel>
+
+                <!-- Center: transport controls -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal"
+                            VerticalAlignment="Center" Margin="0,0,24,0">
+                    <!-- Back 10s -->
+                    <Button Style="{StaticResource IconButtonStyle}" Width="36" Height="36"
+                            Click="SeekBack_Click" ToolTip="Back 10 seconds">
+                        <TextBlock Text="⏪" FontSize="14"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    </Button>
+                    <!-- Play / Pause -->
+                    <Button x:Name="PlayerPlayPauseButton"
+                            Width="52" Height="44" Margin="8,0"
+                            Click="PlayerPlayPause_Click"
+                            Background="{DynamicResource AccentBrush}"
+                            BorderThickness="0" Cursor="Hand"
+                            FocusVisualStyle="{x:Null}">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="Bd"
+                                        Background="{TemplateBinding Background}"
+                                        CornerRadius="10"
+                                        Width="{TemplateBinding Width}"
+                                        Height="{TemplateBinding Height}">
+                                    <ContentPresenter HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Bd" Property="Background"
+                                                Value="{DynamicResource AccentHoverBrush}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter TargetName="Bd" Property="Opacity" Value="0.85"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <!-- Pause icon (two bars) — shown when playing -->
+                        <Grid x:Name="PlayerPlayPauseIcon" Width="18" Height="18">
+                            <!-- Pause bars (default) -->
+                            <StackPanel x:Name="PauseIcon" Orientation="Horizontal"
+                                        HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Border Width="5" Height="16" CornerRadius="2"
+                                        Background="White"/>
+                                <Border Width="5" Height="16" CornerRadius="2"
+                                        Background="White" Margin="4,0,0,0"/>
+                            </StackPanel>
+                            <!-- Play triangle (hidden when playing) -->
+                            <Path x:Name="PlayIcon" Visibility="Collapsed"
+                                  Fill="White" VerticalAlignment="Center"
+                                  HorizontalAlignment="Center"
+                                  Margin="2,0,0,0"
+                                  Data="M0,0 L14,8 L0,16 Z"/>
+                        </Grid>
+                    </Button>
+                    <!-- Forward 10s -->
+                    <Button Style="{StaticResource IconButtonStyle}" Width="36" Height="36"
+                            Click="SeekForward_Click" ToolTip="Forward 10 seconds">
+                        <TextBlock Text="⏩" FontSize="14"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    </Button>
+                    <!-- Stop -->
+                    <Button Style="{StaticResource IconButtonStyle}" Width="36" Height="36"
+                            Margin="8,0,0,0" Click="StopPlayerBar_Click" ToolTip="Stop">
+                        <Border Width="12" Height="12" CornerRadius="2"
+                                Background="{DynamicResource DangerBrush}"/>
+                    </Button>
+                </StackPanel>
+
+                <!-- Right: SRT + Save -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="PlayerSrtButton"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Height="34" Padding="14,0" Margin="0,0,8,0"
+                            Visibility="Collapsed"
+                            Click="ExportSrtJob_Click">
+                        <TextBlock Text="↓  Export SRT" FontSize="12"/>
+                    </Button>
+                    <Button x:Name="PlayerSaveButton"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Height="34" Padding="14,0"
+                            Click="PlayerSave_Click">
+                        <TextBlock Text="↓  Save" FontSize="12"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Job list — fill remaining space -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ItemsControl x:Name="JobList" Margin="24,16,24,24">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="16">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Left: info -->
+                                <StackPanel Grid.Column="0">
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                        <Border CornerRadius="4" Padding="6,2" Margin="0,0,8,0"
+                                                Background="{Binding StatusBg}">
+                                            <TextBlock Text="{Binding StatusLabel}" FontSize="10"
+                                                       FontWeight="SemiBold" Foreground="{Binding StatusFg}"/>
+                                        </Border>
+                                        <TextBlock Text="{Binding DisplayTitle}" FontSize="13" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                                   TextTrimming="CharacterEllipsis" MaxWidth="420"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding VoiceId}"
+                                                   Style="{StaticResource TextMuted}" Margin="0,0,12,0"/>
+                                        <TextBlock Text="{Binding ModelId}"
+                                                   Style="{StaticResource TextMuted}" Margin="0,0,12,0"/>
+                                        <TextBlock Text="{Binding CharacterCount, StringFormat='{}{0:N0} chars'}"
+                                                   Style="{StaticResource TextMuted}" Margin="0,0,12,0"/>
+                                        <TextBlock Text="{Binding FormattedFileSize}"
+                                                   Style="{StaticResource TextMuted}" Margin="0,0,12,0"/>
+                                        <TextBlock Text="{Binding CreatedAtLabel}"
+                                                   Style="{StaticResource TextMuted}"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding ErrorMessage}" FontSize="11"
+                                               Foreground="{DynamicResource DangerBrush}"
+                                               Margin="0,4,0,0" TextWrapping="Wrap"
+                                               Visibility="{Binding HasError}"/>
+                                    <TextBlock FontSize="11" Foreground="{DynamicResource WarningBrush}"
+                                               Margin="0,4,0,0" Visibility="{Binding CanResume}"
+                                               Text="{Binding ResumeFrom, Mode=OneWay, StringFormat='↻ Can resume from chunk {0}'}"/>
+                                </StackPanel>
+
+                                <!-- Right: actions -->
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button Content="▶  Play"
+                                            Style="{StaticResource SecondaryButtonStyle}"
+                                            FontSize="11" Height="30" Padding="10,0" Margin="0,0,6,0"
+                                            Tag="{Binding JobId}" Visibility="{Binding CanPlay}"
+                                            Click="PlayJob_Click"/>
+                                    <Button Content="↓  Save"
+                                            Style="{StaticResource SecondaryButtonStyle}"
+                                            FontSize="11" Height="30" Padding="10,0" Margin="0,0,6,0"
+                                            Tag="{Binding JobId}" Visibility="{Binding CanPlay}"
+                                            Click="SaveJob_Click"/>
+                                    <Button Content="↻  Resume"
+                                            Style="{StaticResource SecondaryButtonStyle}"
+                                            FontSize="11" Height="30" Padding="10,0" Margin="0,0,6,0"
+                                            Tag="{Binding JobId}" Visibility="{Binding CanResume}"
+                                            Click="ResumeJob_Click"/>
+                                    <Button Content="🗑"
+                                            Style="{StaticResource SecondaryButtonStyle}"
+                                            FontSize="13" Height="30" Width="30" Padding="0"
+                                            Tag="{Binding JobId}" Click="DeleteJob_Click"
+                                            Foreground="{DynamicResource DangerBrush}" ToolTip="Delete job"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+    </DockPanel>
+</Page>

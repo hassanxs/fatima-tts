@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Fatima TTS — WiX 4 MSI installer
+  Build: wix build FatimaTTS.wxs -o FatimaTTS-installer.msi
+  Requires: dotnet tool install -g wix
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+
+  <Package
+    Name="Fatima TTS"
+    Version="1.0.0"
+    Manufacturer="Hassan / Fatima TTS"
+    UpgradeCode="A1B2C3D4-E5F6-7890-ABCD-EF1234567890"
+    InstallerVersion="500"
+    Compressed="yes">
+
+    <!-- Allow silent upgrade of older versions -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Fatima TTS is already installed." />
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Install to Program Files -->
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="FatimaTTS">
+
+        <Component Id="MainExecutable" Guid="B1C2D3E4-F5A6-7890-BCDE-F12345678901">
+          <File Id="FatimaTTS.exe"
+                Source="..\publish\FatimaTTS.exe"
+                KeyPath="yes"
+                Checksum="yes"/>
+        </Component>
+
+        <!-- Start Menu shortcut -->
+        <Component Id="StartMenuShortcut" Guid="C2D3E4F5-A6B7-8901-CDEF-012345678902">
+          <Shortcut Id="StartMenuSC"
+                    Name="Fatima TTS"
+                    Description="Windows-native Inworld TTS client"
+                    Target="[INSTALLFOLDER]FatimaTTS.exe"
+                    WorkingDirectory="INSTALLFOLDER"/>
+          <RemoveFolder Id="RemoveStartMenu" On="uninstall"/>
+          <RegistryValue Root="HKCU"
+                         Key="Software\FatimaTTS"
+                         Name="installed"
+                         Type="integer"
+                         Value="1"
+                         KeyPath="yes"/>
+        </Component>
+
+        <!-- Desktop shortcut (optional — user can decline) -->
+        <Component Id="DesktopShortcut" Guid="D3E4F5A6-B7C8-9012-DEF0-123456789003">
+          <Shortcut Id="DesktopSC"
+                    Directory="DesktopFolder"
+                    Name="Fatima TTS"
+                    Target="[INSTALLFOLDER]FatimaTTS.exe"
+                    WorkingDirectory="INSTALLFOLDER"/>
+          <RemoveFolder Id="RemoveDesktop" Directory="DesktopFolder" On="uninstall"/>
+          <RegistryValue Root="HKCU"
+                         Key="Software\FatimaTTS"
+                         Name="desktopShortcut"
+                         Type="integer"
+                         Value="1"
+                         KeyPath="yes"/>
+        </Component>
+
+      </Directory>
+    </StandardDirectory>
+
+    <!-- Add/Remove Programs entry -->
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/YOUR_GITHUB_USERNAME/fatima-tts"/>
+    <Property Id="ARPHELPLINK"     Value="https://github.com/YOUR_GITHUB_USERNAME/fatima-tts/issues"/>
+    <Property Id="ARPNOREPAIR"     Value="1"/>
+
+    <Feature Id="ProductFeature" Title="Fatima TTS" Level="1">
+      <ComponentRef Id="MainExecutable"/>
+      <ComponentRef Id="StartMenuShortcut"/>
+      <ComponentRef Id="DesktopShortcut"/>
+    </Feature>
+
+  </Package>
+</Wix>

@@ -1,0 +1,22 @@
+## .NET / C#
+bin/
+obj/
+*.user
+*.suo
+.vs/
+publish/
+*.nupkg
+
+## Build artifacts
+installer/*.msi
+installer/*.wixpdb
+
+## OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+## Secrets — never commit these
+appsettings.Development.json
+*.pfx
+*.p12
