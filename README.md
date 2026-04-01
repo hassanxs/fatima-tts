@@ -1,55 +1,67 @@
 # Fatima TTS
 
-> Windows-native desktop client for the [Inworld TTS API](https://docs.inworld.ai/docs/tts/tts.md) — no timeouts, no lost credits, full resume-on-failure support.
+> Windows desktop client for the [Inworld TTS API](https://docs.inworld.ai/docs/tts/tts.md) — generate unlimited-length audio, manage voices, and batch process files with full resume support.
 
 ![Fatima TTS Screenshot](docs/screenshot.png)
 
 ## Why?
 
-The web-based Inworld TTS workflow has a critical flaw: PHP's request timeout ceiling means long jobs silently fail mid-way through, burning API credits for audio you never receive. Fatima TTS eliminates this entirely by running as a native Windows process with no timeout ceiling, per-chunk retry logic, and the ability to resume interrupted jobs from exactly where they left off.
+The official [inworld.ai](https://inworld.ai) website limits each generation to **2,000 characters**, which makes it impractical for long-form content like audiobooks, podcasts, voiceovers, and narrations. Fatima TTS removes that limitation entirely:
 
-| PHP Problem | Fatima TTS Solution |
+| Limitation on inworld.ai | Fatima TTS |
 |---|---|
-| Web server timeout (30–120s) | No timeout — runs as long as needed |
-| Silent failure, no visibility | Per-chunk status tracked live in UI |
-| Full re-bill on retry | Resume from failed chunk only |
-| Internet hiccup kills whole job | Per-chunk retry with backoff |
-| Credits wasted on partial jobs | Job only marked complete when all chunks succeed |
+| 2,000 character limit per generation | Unlimited text length — automatically splits and merges |
+| No batch processing | Generate multiple jobs at once from CSV or TXT files |
+| No resume if something goes wrong | Resumes from the exact chunk that failed — no re-billing |
+| Manual download per job | Auto-saves audio + SRT subtitles to your output folder |
+| No voice design tool | Design custom voices from text descriptions |
 
 ## Features
 
-- **Generate Speech** — large text input with live character counter, job title, chunked synthesis with per-chunk progress
-- **Batch Generate** — CSV/TXT file upload or manual queue entry, sequential output naming (`01-Hook.mp3`, `02-Parte 1.mp3`), FFmpeg merge option
-- **My Jobs** — full history with waveform player bar, seek, SRT export, resume interrupted jobs
-- **Batch Detail** — dedicated page per batch showing all jobs, status, play/save per job
-- **Voice Library** — browse all voices, preview, filter by type (system/cloned)
-- **Voice Cloning** — upload audio samples, submit to Inworld clone API
-- **Voice Design** — describe a voice in text, generate 3 previews, publish to library
+- **Unlimited text length** — automatically chunks long text and merges the audio seamlessly
+- **Batch Generate** — process multiple jobs at once from a CSV or TXT file, sequential output naming (`01-Hook.mp3`, `02-Parte 1.mp3`)
+- **Resume on failure** — if a job fails mid-way, only the failed chunks are retried — already completed chunks are not re-billed
+- **My Jobs** — full history with waveform player, seek, SRT export, resume interrupted jobs
+- **Batch Detail** — dedicated page per batch showing all jobs with play/save/status
+- **Voice Library** — browse all voices, preview, filter by type
+- **Voice Cloning** — upload audio samples and clone any voice
+- **Voice Design** — describe a voice in text, generate previews, publish to library
+- **SRT Subtitles** — word-level subtitle files saved automatically alongside every audio file
+- **FFmpeg Integration** — auto-downloaded and managed, lossless batch merge into one file
 - **Dashboard** — stats overview, 14-day usage chart, recent jobs
-- **SRT Export** — word-level subtitle files saved automatically alongside audio
-- **FFmpeg Integration** — auto-downloaded and managed, batch merge without quality loss
-- **Dark/Light theme** — persisted preference
-- **Windows toast notifications** — background job completion alerts
-- **Per-chunk resume** — if a job fails at chunk 14 of 30, only chunks 14–30 are retried
+- **Dark / Light theme** — persisted preference
+- **Windows notifications** — get notified when long jobs complete in the background
 
 ## Requirements
 
 - Windows 10 or 11 (x64)
 - [Inworld API key](https://platform.inworld.ai/)
-- FFmpeg is auto-downloaded on first use (optional — only needed for batch merge)
 
 ## Installation
 
-### Option 1 — Installer (recommended)
-Download `FatimaTTS-v1.0.0-installer.msi` from the [latest release](https://github.com/YOUR_GITHUB_USERNAME/fatima-tts/releases/latest) and run it.
+Download `FatimaTTS-v1.0.0-installer.msi` from the [latest release](https://github.com/hassanxs/fatima-tts/releases/latest) and run it.
 
-### Option 2 — Portable EXE
-Download `FatimaTTS-v1.0.0-win-x64.exe` from [releases](https://github.com/YOUR_GITHUB_USERNAME/fatima-tts/releases/latest) and run directly — no installation needed.
+The installer will:
+- Install to `C:\Program Files\Fatima TTS\`
+- Create a Start Menu shortcut
+- Create a Desktop shortcut
+- Register in Add/Remove Programs for clean uninstall
 
-## Building from source
+FFmpeg is downloaded automatically on first use (only needed for batch merge).
+
+## Getting Started
+
+1. Install and launch Fatima TTS
+2. Go to **Settings** and paste your [Inworld API key](https://platform.inworld.ai/)
+3. Click **Validate** to confirm the key works
+4. Go to **Generate Speech** and start generating
+
+Your API key is stored securely using Windows DPAPI — never written to disk in plaintext.
+
+## Building from Source
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/fatima-tts.git
+git clone https://github.com/hassanxs/fatima-tts.git
 cd fatima-tts
 dotnet restore FatimaTTS/FatimaTTS.csproj
 dotnet run --project FatimaTTS/FatimaTTS.csproj
@@ -57,25 +69,12 @@ dotnet run --project FatimaTTS/FatimaTTS.csproj
 
 ### Publish self-contained exe
 
-```bash
-dotnet publish FatimaTTS/FatimaTTS.csproj \
-  -c Release -r win-x64 --self-contained true \
-  -p:PublishSingleFile=true \
-  -p:IncludeNativeLibrariesForSelfExtract=true \
+```powershell
+dotnet publish FatimaTTS/FatimaTTS.csproj `
+  -c Release -r win-x64 --self-contained true `
+  -p:PublishSingleFile=true `
   -o publish/
 ```
-
-### Build MSI installer
-
-```bash
-dotnet tool install -g wix
-cd installer
-wix build FatimaTTS.wxs -o FatimaTTS-installer.msi
-```
-
-## Configuration
-
-On first launch, go to **Settings** and enter your Inworld API key. It is stored securely using Windows DPAPI (Credential Manager) — never written to disk in plaintext.
 
 ## Logs
 
@@ -83,7 +82,8 @@ Application logs are saved to:
 ```
 %AppData%\FatimaTTS\logs\fatima_YYYY-MM-DD.log
 ```
-Logs rotate daily and are pruned after 30 days.
+
+Logs rotate daily and are pruned after 30 days. Open the logs folder from **Settings → Logs → Open Folder**.
 
 ## Tech Stack
 
