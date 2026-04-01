@@ -20,3 +20,5 @@ desktop.ini
 appsettings.Development.json
 *.pfx
 *.p12
+
+installer/
