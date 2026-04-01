@@ -9,8 +9,8 @@
   <Package
     Name="Fatima TTS"
     Version="1.0.0"
-    Manufacturer="Hassan / Fatima TTS"
-    UpgradeCode="A1B2C3D4-E5F6-7890-ABCD-EF1234567890"
+    Manufacturer="Hassan Latif / Fatima TTS"
+    UpgradeCode="F0C9FC37-F4AA-40D8-9AFF-97D108F34508"
     InstallerVersion="500"
     Compressed="yes">
 
@@ -23,7 +23,7 @@
     <StandardDirectory Id="ProgramFiles64Folder">
       <Directory Id="INSTALLFOLDER" Name="FatimaTTS">
 
-        <Component Id="MainExecutable" Guid="B1C2D3E4-F5A6-7890-BCDE-F12345678901">
+        <Component Id="MainExecutable" Guid="4E77ED9A-425D-465F-9516-79A1A51A29CF">
           <File Id="FatimaTTS.exe"
                 Source="..\publish\FatimaTTS.exe"
                 KeyPath="yes"
@@ -31,7 +31,7 @@
         </Component>
 
         <!-- Start Menu shortcut -->
-        <Component Id="StartMenuShortcut" Guid="C2D3E4F5-A6B7-8901-CDEF-012345678902">
+        <Component Id="StartMenuShortcut" Guid="30B2BC9E-4CA7-405F-AB9E-E1ABDCC49444">
           <Shortcut Id="StartMenuSC"
                     Name="Fatima TTS"
                     Description="Windows-native Inworld TTS client"
@@ -47,7 +47,7 @@
         </Component>
 
         <!-- Desktop shortcut (optional — user can decline) -->
-        <Component Id="DesktopShortcut" Guid="D3E4F5A6-B7C8-9012-DEF0-123456789003">
+        <Component Id="DesktopShortcut" Guid="4EA9D77F-E65F-4A02-919C-F9CC613CA03D">
           <Shortcut Id="DesktopSC"
                     Directory="DesktopFolder"
                     Name="Fatima TTS"
@@ -66,8 +66,8 @@
     </StandardDirectory>
 
     <!-- Add/Remove Programs entry -->
-    <Property Id="ARPURLINFOABOUT" Value="https://github.com/YOUR_GITHUB_USERNAME/fatima-tts"/>
-    <Property Id="ARPHELPLINK"     Value="https://github.com/YOUR_GITHUB_USERNAME/fatima-tts/issues"/>
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/hassanxs/fatima-tts"/>
+    <Property Id="ARPHELPLINK"     Value="https://github.com/hassanxs/fatima-tts/issues"/>
     <Property Id="ARPNOREPAIR"     Value="1"/>
 
     <Feature Id="ProductFeature" Title="Fatima TTS" Level="1">

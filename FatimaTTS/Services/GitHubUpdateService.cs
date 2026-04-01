@@ -6,12 +6,12 @@ namespace FatimaTTS.Services;
 
 /// <summary>
 /// Checks GitHub Releases API for newer versions of Fatima TTS.
-/// Repository: https://github.com/YOUR_USERNAME/fatima-tts
+/// Repository: https://github.com/hassanxs/fatima-tts
 /// </summary>
 public class GitHubUpdateService
 {
     // ── Config — update these before publishing ───────────────────────────
-    public const string GitHubOwner    = "YOUR_GITHUB_USERNAME";
+    public const string GitHubOwner    = "hassanxs";
     public const string GitHubRepo     = "fatima-tts";
     public const string CurrentVersion = "1.0.0";
     public static readonly string ReleasesUrl =
