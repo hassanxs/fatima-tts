@@ -2,6 +2,13 @@
 
 ## v1.0.0 — Initial Release
 
+### Verify your download
+Always verify the installer before running:
+```powershell
+Get-FileHash "FatimaTTS-v1.0.0-installer.msi" -Algorithm SHA256
+```
+Compare the output with `SHA256SUMS.txt` attached to this release.
+
 ### Features
 - Generate Speech with chunked synthesis, per-chunk retry, and resume-on-failure
 - Batch Generate from CSV/TXT files or manual queue — sequential output naming (01-Hook.mp3, 02-Parte 1.mp3)
