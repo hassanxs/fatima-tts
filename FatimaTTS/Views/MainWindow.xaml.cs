@@ -27,6 +27,10 @@ public partial class MainWindow : Window
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
+        // Sidebar version from the assembly (never hardcode — it goes stale)
+        var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+        if (v is not null) VersionText.Text = $"v{v.Major}.{v.Minor}.{v.Build}";
+
         // Apply saved theme to toggle state
         var saved = _settingsService.Load().Theme;
         ThemeToggle.IsChecked = (saved == "Dark");

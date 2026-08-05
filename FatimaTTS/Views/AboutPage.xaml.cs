@@ -21,6 +21,9 @@ public partial class AboutPage : Page
         VersionLabel.Text = version is not null
             ? $"Version {version.Major}.{version.Minor}.{version.Build}"
             : "Version 1.0.0";
+        WhatsNewLabel.Text = version is not null
+            ? $"WHAT'S NEW IN v{version.Major}.{version.Minor}.{version.Build}"
+            : "WHAT'S NEW";
 
         // Runtime
         DotNetVersion.Text = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;

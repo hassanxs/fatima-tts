@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.2.1
+
+### Fixed
+- The sidebar and the About page's "What's New" section were hardcoded to **v1.0.0**; both now read the real app version and show the current release's highlights.
+- **Installer shortcuts** are now non-advertised and reference the app icon directly, fixing the blank/generic Start-Menu icon that advertised shortcuts caused.
+- The installer now also creates a proper **Desktop shortcut** (with icon), as documented.
+
+### Verify your download
+```powershell
+Get-FileHash "FatimaTTS-v1.2.1-installer.msi" -Algorithm SHA256
+```
+Compare the output with `SHA256SUMS.txt` attached to this release.
+
 ## v1.2.0
 
 ### Added

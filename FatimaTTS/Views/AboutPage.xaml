@@ -48,49 +48,49 @@
                 </Border>
 
                 <!-- What's new -->
-                <TextBlock Text="WHAT'S NEW IN v1.0.0" Style="{StaticResource SectionLabel}"/>
+                <TextBlock x:Name="WhatsNewLabel" Text="WHAT'S NEW" Style="{StaticResource SectionLabel}"/>
                 <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20" Padding="20">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                             <Border Width="6" Height="6" CornerRadius="3"
                                     Background="{DynamicResource AccentBrush}"
                                     VerticalAlignment="Center" Margin="0,0,10,0"/>
-                            <TextBlock Text="Generate speech from text with live progress tracking"
+                            <TextBlock Text="Parallel chunk synthesis — long jobs generate much faster (resume-safe)"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="13"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                             <Border Width="6" Height="6" CornerRadius="3"
                                     Background="{DynamicResource AccentBrush}"
                                     VerticalAlignment="Center" Margin="0,0,10,0"/>
-                            <TextBlock Text="Batch generation from CSV or TXT files — process entire projects at once"
+                            <TextBlock Text="Per-chunk regenerate — re-roll a single chunk without redoing the job"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="13"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                             <Border Width="6" Height="6" CornerRadius="3"
                                     Background="{DynamicResource AccentBrush}"
                                     VerticalAlignment="Center" Margin="0,0,10,0"/>
-                            <TextBlock Text="Voice cloning — create a custom voice from any audio sample"
+                            <TextBlock Text="Delivery-mode steering, language selection, and text-normalization toggle"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="13"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                             <Border Width="6" Height="6" CornerRadius="3"
                                     Background="{DynamicResource AccentBrush}"
                                     VerticalAlignment="Center" Margin="0,0,10,0"/>
-                            <TextBlock Text="In-app audio playback with waveform visualizer and seek control"
+                            <TextBlock Text="Character-level captions — export word- or character-based SRT"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="13"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                             <Border Width="6" Height="6" CornerRadius="3"
                                     Background="{DynamicResource AccentBrush}"
                                     VerticalAlignment="Center" Margin="0,0,10,0"/>
-                            <TextBlock Text="SRT subtitle export with word-level timestamps"
+                            <TextBlock Text="Cost estimate before generating + usage &amp; billing on the Dashboard"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="13"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Border Width="6" Height="6" CornerRadius="3"
                                     Background="{DynamicResource AccentBrush}"
                                     VerticalAlignment="Center" Margin="0,0,10,0"/>
-                            <TextBlock Text="Interrupted jobs resume automatically — never lose completed work"
+                            <TextBlock Text="Edit cloned voices — name, description, tags, gender, age, and categories"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="13"/>
                         </StackPanel>
                     </StackPanel>
