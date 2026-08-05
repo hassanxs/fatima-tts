@@ -136,7 +136,9 @@ public partial class VoiceLibraryPage : Page
             var (audioBytes, _, _) = await _tts.SynthesizeAsync(
                 apiKey, PreviewText, voiceId,
                 "inworld-tts-1.5-max", "MP3",
-                temperature: 1.1, speakingRate: 1.0);
+                temperature: 1.1, speakingRate: 1.0,
+                language: null, deliveryMode: null,
+                timestampType: "WORD", applyTextNormalization: true);
 
             var tempPath = System.IO.Path.Combine(
                 System.IO.Path.GetTempPath(),
@@ -177,6 +179,31 @@ public partial class VoiceLibraryPage : Page
             _settingsService.Save(settings);
             MessageBox.Show($"Voice set as default. It will be pre-selected on Generate Speech.",
                 "Voice Updated", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+    }
+
+    private async void EditVoice_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { Tag: string voiceId }) return;
+
+        var voice = _allVoices.FirstOrDefault(v => v.VoiceId == voiceId);
+        if (voice is null) return;
+
+        var dlg = new EditVoiceWindow(voice) { Owner = Window.GetWindow(this) };
+        if (dlg.ShowDialog() != true || dlg.Result is null) return;
+
+        var apiKey = _credentials.LoadApiKey();
+        if (string.IsNullOrWhiteSpace(apiKey)) return;
+
+        try
+        {
+            await _tts.UpdateVoiceAsync(apiKey, voiceId, dlg.Result);
+            await LoadVoicesAsync();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Failed to update voice: {ex.Message}",
+                "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 

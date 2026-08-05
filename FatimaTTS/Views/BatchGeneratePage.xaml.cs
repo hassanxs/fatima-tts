@@ -452,6 +452,9 @@ public partial class BatchGeneratePage : Page
             System.Globalization.CultureInfo.InvariantCulture, out double speakingRate);
         if (speakingRate <= 0) speakingRate = 1.0;
 
+        // Batch jobs use the app-wide defaults for the v1.2.0 synthesis options.
+        var batchSettings = _settingsService.Load();
+
         if (string.IsNullOrWhiteSpace(voiceId))
         {
             MessageBox.Show("Please select a voice.", "No Voice",
@@ -529,6 +532,10 @@ public partial class BatchGeneratePage : Page
                 AudioEncoding  = encoding,
                 Temperature    = 1.1,
                 SpeakingRate   = speakingRate,
+                Language       = string.IsNullOrWhiteSpace(batchSettings.DefaultLanguage) ? null : batchSettings.DefaultLanguage,
+                DeliveryMode   = string.IsNullOrWhiteSpace(batchSettings.DefaultDeliveryMode) ? null : batchSettings.DefaultDeliveryMode,
+                TimestampType  = string.IsNullOrWhiteSpace(batchSettings.DefaultTimestampType) ? "WORD" : batchSettings.DefaultTimestampType,
+                ApplyTextNormalization = batchSettings.DefaultApplyTextNormalization ? "ON" : "OFF",
             };
 
             try
@@ -555,14 +562,16 @@ public partial class BatchGeneratePage : Page
                         File.Copy(job.OutputFilePath, destPath, overwrite: false);
                         completedFilePaths.Add(destPath); // track for merge
 
-                        // Auto-save SRT alongside audio if timestamps available
-                        var hasTimestamps = job.Chunks.Any(c => c.Words.Count > 0);
-                        if (hasTimestamps)
+                        // Auto-save SRT alongside audio if timestamps available (both granularities when present)
+                        if (SrtExportService.HasWordData(job))
                         {
                             try
                             {
-                                var srtPath = System.IO.Path.ChangeExtension(destPath, ".srt");
-                                _srtExport.ExportSrt(job, srtPath);
+                                _srtExport.ExportSrt(job,
+                                    System.IO.Path.ChangeExtension(destPath, ".srt"), characterLevel: false);
+                                if (SrtExportService.HasCharData(job))
+                                    _srtExport.ExportSrt(job,
+                                        System.IO.Path.ChangeExtension(destPath, ".char.srt"), characterLevel: true);
                             }
                             catch { /* SRT save failure is non-fatal */ }
                         }

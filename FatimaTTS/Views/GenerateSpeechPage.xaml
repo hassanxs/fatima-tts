@@ -112,6 +112,13 @@
                                            FontSize="11"
                                            Foreground="{DynamicResource TextMutedBrush}"
                                            VerticalAlignment="Center"/>
+                                <TextBlock x:Name="EstimateText"
+                                           Text=""
+                                           FontSize="11" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource AccentBrush}"
+                                           VerticalAlignment="Center"
+                                           Margin="12,0,0,0"
+                                           ToolTip="Estimated cost at the configured price for the selected model. Adjust rates in Settings."/>
                             </StackPanel>
                         </Grid>
                     </Border>
@@ -173,6 +180,7 @@
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="28"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0"
                                                    Text="{Binding ChunkIndex}"
@@ -197,6 +205,15 @@
                                                    Foreground="{DynamicResource TextMutedBrush}"
                                                    HorizontalAlignment="Right"
                                                    VerticalAlignment="Center"/>
+                                        <Button Grid.Column="4"
+                                                Content="↻"
+                                                Style="{StaticResource IconButtonStyle}"
+                                                Width="24" Height="24"
+                                                FontSize="12"
+                                                Visibility="{Binding RegenVisibility}"
+                                                Tag="{Binding ChunkIndexRaw}"
+                                                ToolTip="Regenerate this chunk"
+                                                Click="RegenerateChunk_Click"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -539,6 +556,38 @@
                                         Value="1.0" TickFrequency="0.1"
                                         IsSnapToTickEnabled="True"
                                         ValueChanged="SpeakingRateSlider_ValueChanged"/>
+
+                                <!-- Language -->
+                                <TextBlock Text="Language"
+                                           Style="{StaticResource TextSecondary}"
+                                           Margin="0,14,0,4"/>
+                                <ComboBox x:Name="LanguageComboBox"
+                                          Style="{StaticResource ComboStyle}"
+                                          ToolTip="Language of the text. 'Voice default' uses the selected voice's own language."/>
+
+                                <!-- Delivery mode (steering) -->
+                                <TextBlock Text="Delivery Mode (steering)"
+                                           Style="{StaticResource TextSecondary}"
+                                           Margin="0,12,0,4"/>
+                                <ComboBox x:Name="DeliveryModeComboBox"
+                                          Style="{StaticResource ComboStyle}"
+                                          ToolTip="Steers expressiveness. Best supported on Inworld TTS 2."/>
+
+                                <!-- Subtitle timestamp granularity -->
+                                <TextBlock Text="Subtitle Timestamps"
+                                           Style="{StaticResource TextSecondary}"
+                                           Margin="0,12,0,4"/>
+                                <ComboBox x:Name="TimestampTypeComboBox"
+                                          Style="{StaticResource ComboStyle}"
+                                          ToolTip="Word-level or character-level timing for SRT export. Character-level lets you export either granularity."/>
+
+                                <!-- Text normalization -->
+                                <CheckBox x:Name="NormalizationCheckBox"
+                                          Content="Text normalization"
+                                          Foreground="{DynamicResource TextSecondaryBrush}"
+                                          FontSize="12"
+                                          Margin="0,16,0,0"
+                                          ToolTip="Expands numbers, dates, and abbreviations into spoken form."/>
                             </StackPanel>
                         </Expander>
 

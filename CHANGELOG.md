@@ -1,5 +1,28 @@
 # Changelog
 
+## v1.2.0
+
+### Added
+- **Parallel chunk synthesis** — long jobs now synthesize multiple chunks at once (configurable in Settings, default 3, capped to your Inworld plan's concurrency limit). Resume-on-failure and per-chunk retry are fully preserved.
+- **Per-chunk regenerate** — re-roll a single chunk from the Generate page's chunk list without redoing the whole job; the output is re-merged automatically.
+- **Pre-generation cost estimate** — the Generate page shows the estimated cost for the current text and model before you synthesize.
+- **Usage & billing on the Dashboard** — estimated spend from characters actually billed by the API, plus a shortcut to the Inworld Portal usage page (Inworld has no usage API; the portal remains authoritative).
+- **Configurable pricing** — per-model price-per-1M-characters in Settings, pre-filled with Inworld On-Demand rates, drives all cost figures.
+- **Delivery Mode steering** — Stable / Balanced / Creative (best on Inworld TTS 2).
+- **Language selection** — pick a BCP-47 language per generation, or leave it on the voice's default.
+- **Text-normalization toggle** — control whether numbers, dates, and abbreviations are expanded.
+- **Character-level captions** — choose Word- or Character-level timestamps; export either granularity as SRT (character data can produce both).
+- **Update Voice** — edit a cloned voice's name, description, tags, gender, age group, and categories from the Voice Library.
+
+### Changed
+- Chunk splitting now targets a 1,900-character maximum (down from 2,000) for a safety margin against the hard API limit.
+
+### Verify your download
+```powershell
+Get-FileHash "FatimaTTS-v1.2.0-installer.msi" -Algorithm SHA256
+```
+Compare the output with `SHA256SUMS.txt` attached to this release.
+
 ## v1.1.0
 
 ### Changed

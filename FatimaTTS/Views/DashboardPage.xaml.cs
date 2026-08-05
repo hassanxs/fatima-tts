@@ -29,6 +29,12 @@ public partial class DashboardPage : Page
                 .Where(c => c.Status == ChunkStatus.Completed && c.RetryCount == 0)
                 .Sum(c => c.ApiProcessedChars));
 
+        // ── Usage & billing (estimated from real billed chars per model) ─────
+        var settings   = App.Services.GetRequiredService<SettingsService>().Load();
+        double estCost = jobs.Where(j => j.Status == JobStatus.Completed)
+                             .Sum(j => settings.EstimateCost(j.CharactersBilled, j.ModelId));
+        EstCostStat.Text = $"${estCost:0.00}";
+
         // ── Recent jobs ──────────────────────────────────────────────────
         var recent = jobs.OrderByDescending(j => j.CreatedAt).Take(5).ToList();
         if (recent.Count > 0)
@@ -225,6 +231,16 @@ public partial class DashboardPage : Page
     private void QuickClone_Click(object sender, RoutedEventArgs e)
     {
         if (Window.GetWindow(this) is MainWindow mw) mw.NavigateToPage("voiceclone");
+    }
+
+    private void PortalUsage_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
+                "https://platform.inworld.ai/usage") { UseShellExecute = true });
+        }
+        catch { /* browser launch failure is non-fatal */ }
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────

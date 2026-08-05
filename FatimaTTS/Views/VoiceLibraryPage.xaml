@@ -191,6 +191,13 @@
                                                 Margin="6,0,0,0"
                                                 Tag="{Binding VoiceId}"
                                                 Click="UseVoice_Click"/>
+                                        <Button Content="✎"
+                                                Style="{StaticResource SecondaryButtonStyle}"
+                                                FontSize="11" Height="28" Width="28" Padding="0"
+                                                Margin="6,0,0,0"
+                                                ToolTip="Edit voice details"
+                                                Tag="{Binding VoiceId}"
+                                                Click="EditVoice_Click"/>
                                         <Button Content="✕"
                                                 Style="{StaticResource SecondaryButtonStyle}"
                                                 FontSize="11" Height="28" Width="28" Padding="0"

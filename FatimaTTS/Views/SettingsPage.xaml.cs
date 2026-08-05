@@ -75,7 +75,39 @@ public partial class SettingsPage : Page
         DefaultTempValue.Text   = settings.DefaultTemperature.ToString("F1");
         DefaultRateValue.Text   = settings.DefaultSpeakingRate.ToString("F1") + "×";
 
+        // Generation defaults (v1.2.0)
+        DefaultLanguageCombo.Items.Clear();
+        foreach (var (code, name) in AppSettings.CommonLanguages)
+            DefaultLanguageCombo.Items.Add(new ComboBoxItem { Content = name, Tag = code });
+        SelectComboByTag(DefaultLanguageCombo, settings.DefaultLanguage);
+
+        DefaultDeliveryModeCombo.Items.Clear();
+        foreach (var kvp in AppSettings.DeliveryModes)
+            DefaultDeliveryModeCombo.Items.Add(new ComboBoxItem { Content = kvp.Value, Tag = kvp.Key });
+        SelectComboByTag(DefaultDeliveryModeCombo, settings.DefaultDeliveryMode);
+
+        DefaultTimestampTypeCombo.Items.Clear();
+        foreach (var kvp in AppSettings.TimestampTypes)
+            DefaultTimestampTypeCombo.Items.Add(new ComboBoxItem { Content = kvp.Value, Tag = kvp.Key });
+        SelectComboByTag(DefaultTimestampTypeCombo, settings.DefaultTimestampType);
+
+        DefaultNormalizationCheck.IsChecked = settings.DefaultApplyTextNormalization;
+
+        MaxParallelSlider.Value = settings.MaxParallelChunks;
+        MaxParallelValue.Text   = settings.MaxParallelChunks.ToString();
+
+        // Pricing
+        PriceTts2Box.Text = settings.GetPricePerMillion("inworld-tts-2").ToString("0.##");
+        PriceMaxBox.Text  = settings.GetPricePerMillion("inworld-tts-1.5-max").ToString("0.##");
+        PriceMiniBox.Text = settings.GetPricePerMillion("inworld-tts-1.5-mini").ToString("0.##");
+
         _loaded = true;
+    }
+
+    private void MaxParallelSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (MaxParallelValue is not null)
+            MaxParallelValue.Text = ((int)e.NewValue).ToString();
     }
 
     private void RefreshApiKeyStatus()
@@ -210,6 +242,19 @@ public partial class SettingsPage : Page
         settings.DefaultSpeakingRate  = DefaultRateSlider.Value;
         settings.OutputFolder         = OutputFolderBox.Text.Trim();
 
+        // Generation defaults (v1.2.0)
+        settings.DefaultLanguage               = GetComboTag(DefaultLanguageCombo) ?? "";
+        settings.DefaultDeliveryMode           = GetComboTag(DefaultDeliveryModeCombo) ?? "";
+        settings.DefaultTimestampType          = GetComboTag(DefaultTimestampTypeCombo) ?? "WORD";
+        settings.DefaultApplyTextNormalization = DefaultNormalizationCheck.IsChecked == true;
+        settings.MaxParallelChunks             = (int)MaxParallelSlider.Value;
+
+        // Pricing (keep any existing keys, overwrite the three known models)
+        settings.PricePerMillionChars = new Dictionary<string, double>(settings.PricePerMillionChars);
+        UpdatePrice(settings, "inworld-tts-2",        PriceTts2Box.Text);
+        UpdatePrice(settings, "inworld-tts-1.5-max",  PriceMaxBox.Text);
+        UpdatePrice(settings, "inworld-tts-1.5-mini", PriceMiniBox.Text);
+
         _settingsService.Save(settings);
 
         SavedConfirmText.Visibility = Visibility.Visible;
@@ -244,6 +289,13 @@ public partial class SettingsPage : Page
 
     private static string? GetComboTag(ComboBox combo)
         => (combo.SelectedItem as ComboBoxItem)?.Tag?.ToString();
+
+    private static void UpdatePrice(AppSettings s, string modelId, string text)
+    {
+        if (double.TryParse(text, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out var v) && v >= 0)
+            s.PricePerMillionChars[modelId] = v;
+    }
 
     // ── FFmpeg ────────────────────────────────────────────────────────────
 

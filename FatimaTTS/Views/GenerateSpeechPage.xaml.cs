@@ -66,7 +66,50 @@ public partial class GenerateSpeechPage : Page
     {
         LoadSettings();
         PopulateFormats();
+        PopulateAdvancedOptions();
         await LoadVoicesAsync();
+    }
+
+    private void PopulateAdvancedOptions()
+    {
+        var s = _settingsService.Load();
+
+        LanguageComboBox.Items.Clear();
+        foreach (var (code, name) in AppSettings.CommonLanguages)
+            LanguageComboBox.Items.Add(new ComboBoxItem { Content = name, Tag = code });
+        SelectComboByTag(LanguageComboBox, s.DefaultLanguage);
+
+        DeliveryModeComboBox.Items.Clear();
+        foreach (var kvp in AppSettings.DeliveryModes)
+            DeliveryModeComboBox.Items.Add(new ComboBoxItem { Content = kvp.Value, Tag = kvp.Key });
+        SelectComboByTag(DeliveryModeComboBox, s.DefaultDeliveryMode);
+
+        TimestampTypeComboBox.Items.Clear();
+        foreach (var kvp in AppSettings.TimestampTypes)
+            TimestampTypeComboBox.Items.Add(new ComboBoxItem { Content = kvp.Value, Tag = kvp.Key });
+        SelectComboByTag(TimestampTypeComboBox, s.DefaultTimestampType);
+
+        NormalizationCheckBox.IsChecked = s.DefaultApplyTextNormalization;
+    }
+
+    private static void SelectComboByTag(ComboBox combo, string tag)
+    {
+        tag ??= "";
+        foreach (ComboBoxItem item in combo.Items)
+            if ((item.Tag as string ?? "") == tag) { combo.SelectedItem = item; return; }
+        if (combo.Items.Count > 0) combo.SelectedIndex = 0;
+    }
+
+    private static string ComboTag(ComboBox combo) =>
+        (combo.SelectedItem as ComboBoxItem)?.Tag as string ?? "";
+
+    // Estimated cost for the current text length + selected model (configurable pricing).
+    private void UpdateEstimate(int charCount)
+    {
+        if (EstimateText is null) return;
+        if (charCount <= 0) { EstimateText.Text = ""; return; }
+        var cost = _settingsService.Load().EstimateCost(charCount, _selectedModelId);
+        EstimateText.Text = cost > 0 ? $"≈ ${cost:0.00}" : "";
     }
 
     private void LoadSettings()
@@ -197,6 +240,8 @@ public partial class GenerateSpeechPage : Page
             ChunkCountText.Text = "";
         }
 
+        UpdateEstimate(count);
+
         // Auto-suggest job title from first sentence if title is still empty
         if (string.IsNullOrWhiteSpace(JobTitleBox.Text) && count > 0)
         {
@@ -271,7 +316,10 @@ public partial class GenerateSpeechPage : Page
     private void ModelRadio_Checked(object sender, RoutedEventArgs e)
     {
         if (sender is RadioButton rb && rb.Tag is string modelId)
+        {
             _selectedModelId = modelId;
+            if (InputTextBox is not null) UpdateEstimate(InputTextBox.Text.Length);
+        }
     }
 
     private void VoiceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -368,6 +416,10 @@ public partial class GenerateSpeechPage : Page
             AudioEncoding  = GetSelectedFormatKey(),
             Temperature    = TemperatureSlider.Value,
             SpeakingRate   = SpeakingRateSlider.Value,
+            Language       = ComboTag(LanguageComboBox) is { Length: > 0 } lang ? lang : null,
+            DeliveryMode   = ComboTag(DeliveryModeComboBox) is { Length: > 0 } dm ? dm : null,
+            TimestampType  = ComboTag(TimestampTypeComboBox) is { Length: > 0 } tt ? tt : "WORD",
+            ApplyTextNormalization = NormalizationCheckBox.IsChecked == true ? "ON" : "OFF",
         };
 
         // Reset title state for next job
@@ -395,8 +447,11 @@ public partial class GenerateSpeechPage : Page
             JobStatusIcon.Foreground = new SolidColorBrush(Color.FromRgb(0x1D, 0x9E, 0x75));
             PlaybackPanel.Visibility = Visibility.Visible;
 
-            // Show SRT button only if job has word timestamps (TTS 1.5 models)
-            var hasTimestamps = _currentJob.Chunks.Any(c => c.Words.Count > 0);
+            // Enable per-chunk regenerate now the job is complete
+            foreach (var cvm in _chunkViewModels) cvm.RegenVisibility = Visibility.Visible;
+
+            // Show SRT button if the job has any timestamp data (word or character)
+            var hasTimestamps = SrtExportService.HasWordData(_currentJob);
             ExportSrtButton.Visibility = hasTimestamps ? Visibility.Visible : Visibility.Collapsed;
 
             // Toast notification
@@ -415,13 +470,16 @@ public partial class GenerateSpeechPage : Page
                 var persistence = App.Services.GetRequiredService<JobPersistenceService>();
                 var destPath    = persistence.ExportToOutputFolder(_currentJob, settings.OutputFolder);
 
-                // Auto-save SRT alongside audio if timestamps available
+                // Auto-save SRT alongside audio if timestamps available (both granularities when present)
                 if (destPath is not null && hasTimestamps)
                 {
                     try
                     {
                         var srtPath = System.IO.Path.ChangeExtension(destPath, ".srt");
-                        _srtExport.ExportSrt(_currentJob, srtPath);
+                        _srtExport.ExportSrt(_currentJob, srtPath, characterLevel: false);
+                        if (SrtExportService.HasCharData(_currentJob))
+                            _srtExport.ExportSrt(_currentJob,
+                                System.IO.Path.ChangeExtension(destPath, ".char.srt"), characterLevel: true);
                     }
                     catch { /* SRT save failure is non-fatal */ }
                 }
@@ -646,17 +704,18 @@ public partial class GenerateSpeechPage : Page
     {
         if (_currentJob is null) return;
 
-        var hasTimestamps = _currentJob.Chunks.Any(c => c.Words.Count > 0);
+        var hasTimestamps = SrtExportService.HasWordData(_currentJob);
         if (!hasTimestamps)
         {
             MessageBox.Show(
-                "No word timestamp data available for this job.\n\n" +
-                "Timestamps are returned by TTS 1.5 models (Max and Mini). " +
-                "Re-generate with Inworld TTS 1.5 Max or Mini to enable SRT export.",
+                "No timestamp data available for this job.\n\n" +
+                "Timestamps are returned by timestamp-capable models. " +
+                "Re-generate to enable SRT export.",
                 "No Timestamps", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
+        var hasChar     = SrtExportService.HasCharData(_currentJob);
         var defaultName = System.IO.Path.GetFileNameWithoutExtension(
             _currentJob.OutputFileName ?? "fatima_tts") + ".srt";
 
@@ -664,7 +723,10 @@ public partial class GenerateSpeechPage : Page
         {
             Title      = "Export SRT Subtitle File",
             FileName   = defaultName,
-            Filter     = "SRT subtitle files|*.srt|All files|*.*",
+            // When character data exists, offer both granularities via the filter dropdown.
+            Filter     = hasChar
+                ? "Word-level SRT|*.srt|Character-level SRT|*.srt|All files|*.*"
+                : "SRT subtitle files|*.srt|All files|*.*",
             DefaultExt = "srt"
         };
 
@@ -672,7 +734,8 @@ public partial class GenerateSpeechPage : Page
         {
             try
             {
-                _srtExport.ExportSrt(_currentJob, dlg.FileName);
+                bool charLevel = hasChar && dlg.FilterIndex == 2;
+                _srtExport.ExportSrt(_currentJob, dlg.FileName, charLevel);
                 MessageBox.Show($"SRT file exported successfully.\n{dlg.FileName}",
                     "Export Complete", MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -740,7 +803,11 @@ public partial class GenerateSpeechPage : Page
                 "inworld-tts-1.5-max",
                 "MP3",
                 temperature: 1.1,
-                speakingRate: 1.0);
+                speakingRate: 1.0,
+                language: null,
+                deliveryMode: null,
+                timestampType: "WORD",
+                applyTextNormalization: true);
 
             // Write to temp file and play
             var tempPath = System.IO.Path.Combine(
@@ -785,6 +852,44 @@ public partial class GenerateSpeechPage : Page
             mw.NavigateToPage("myjobs");
     }
 
+    private async void RegenerateChunk_Click(object sender, RoutedEventArgs e)
+    {
+        if (_currentJob is null || _currentJob.Status != JobStatus.Completed) return;
+        if (sender is not Button { Tag: int chunkIndex } btn) return;
+
+        var apiKey = _credentials.LoadApiKey();
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            MessageBox.Show("Please add your API key in Settings first.",
+                "No API Key", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        btn.IsEnabled = false;
+        _player.Stop();
+        JobStatusIcon.Text = "↻";
+        JobStatusText.Text = $"Regenerating chunk {chunkIndex + 1}…";
+
+        _cts = new CancellationTokenSource();
+        try
+        {
+            await _processor.RegenerateChunkAsync(_currentJob, chunkIndex, apiKey, _cts.Token);
+            JobStatusIcon.Text = "✓";
+            JobStatusText.Text = "Chunk regenerated.";
+            if (_currentJob.OutputFilePath is not null)
+                LoadAudioForPlayback(_currentJob.OutputFilePath);
+        }
+        catch (Exception ex)
+        {
+            JobStatusIcon.Text = "✕";
+            JobStatusText.Text = $"Regenerate failed: {ex.Message}";
+        }
+        finally
+        {
+            btn.IsEnabled = true;
+        }
+    }
+
     private void SetStatus(string message, bool isError = false)
     {
         JobStatusText.Text       = message;
@@ -799,8 +904,10 @@ public partial class GenerateSpeechPage : Page
 public class ChunkViewModel : System.ComponentModel.INotifyPropertyChanged
 {
     private string _statusLabel = "Pending";
+    private Visibility _regenVisibility = Visibility.Collapsed;
 
     public int    ChunkIndex      { get; }
+    public int    ChunkIndexRaw   { get; }   // 0-based, for RegenerateChunkAsync
     public string TextPreview     { get; }
     public int    CharacterCount  { get; }
 
@@ -810,11 +917,19 @@ public class ChunkViewModel : System.ComponentModel.INotifyPropertyChanged
         set { _statusLabel = value; PropertyChanged?.Invoke(this, new(nameof(StatusLabel))); }
     }
 
+    // Regenerate button is shown only once the job has completed.
+    public Visibility RegenVisibility
+    {
+        get => _regenVisibility;
+        set { _regenVisibility = value; PropertyChanged?.Invoke(this, new(nameof(RegenVisibility))); }
+    }
+
     public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
 
     public ChunkViewModel(TtsChunk chunk)
     {
         ChunkIndex     = chunk.ChunkIndex + 1;
+        ChunkIndexRaw  = chunk.ChunkIndex;
         CharacterCount = chunk.CharacterCount;
         TextPreview    = chunk.Text.Length > 60 ? chunk.Text[..60] + "…" : chunk.Text;
         StatusLabel    = chunk.Status switch
