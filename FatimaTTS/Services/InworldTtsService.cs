@@ -56,11 +56,12 @@ public class InworldTtsService
     // ── Speech synthesis ─────────────────────────────────────────────────
 
     /// <summary>
-    /// Synthesizes a single text chunk (≤ 2000 chars).
-    /// Returns the raw audio bytes decoded from base64.
+    /// Synthesizes a single text chunk (≤ 1900 chars).
+    /// Returns the raw audio bytes decoded from base64 plus the full timestamp info
+    /// (word- and/or character-level, depending on <paramref name="timestampType"/>).
     /// Throws InworldApiException on API errors with retry guidance.
     /// </summary>
-    public async Task<(byte[] AudioBytes, int ProcessedChars, WordAlignment? Timestamps)> SynthesizeAsync(
+    public async Task<(byte[] AudioBytes, int ProcessedChars, TimestampInfo? Timestamps)> SynthesizeAsync(
         string apiKey,
         string text,
         string voiceId,
@@ -68,14 +69,22 @@ public class InworldTtsService
         string audioEncoding,
         double temperature,
         double speakingRate,
+        string? language,
+        string? deliveryMode,
+        string timestampType,
+        bool applyTextNormalization,
         CancellationToken ct = default)
     {
         var payload = new SynthesizeSpeechRequest
         {
-            Text    = text,
-            VoiceId = voiceId,
-            ModelId = modelId,
+            Text        = text,
+            VoiceId     = voiceId,
+            ModelId     = modelId,
             Temperature = temperature,
+            Language    = string.IsNullOrWhiteSpace(language)     ? null : language,
+            DeliveryMode = string.IsNullOrWhiteSpace(deliveryMode) ? null : deliveryMode,
+            TimestampType = string.IsNullOrWhiteSpace(timestampType) ? "WORD" : timestampType,
+            ApplyTextNormalization = applyTextNormalization ? "ON" : "OFF",
             AudioConfig = new AudioConfig
             {
                 AudioEncoding  = audioEncoding,
@@ -95,8 +104,7 @@ public class InworldTtsService
 
         var audioBytes     = Convert.FromBase64String(result.AudioContent);
         var processedChars = result.Usage?.ProcessedCharactersCount ?? text.Length;
-        var timestamps     = result.TimestampInfo?.WordAlignment;
-        return (audioBytes, processedChars, timestamps);
+        return (audioBytes, processedChars, result.TimestampInfo);
     }
 
     // ── Voice cloning ─────────────────────────────────────────────────────
@@ -141,6 +149,42 @@ public class InworldTtsService
         var request = BuildRequest(HttpMethod.Delete,
             $"/voices/v1/voices/{Uri.EscapeDataString(voiceId)}", apiKey);
         await SendAsync(request, ct);
+    }
+
+    /// <summary>
+    /// Partially updates a voice's editable metadata.
+    /// PATCH /voices/v1/voices/{voiceId} — only non-null fields on <paramref name="update"/>
+    /// are sent, and their snake_case names are put in the updateMask query param
+    /// (the API silently drops masked-off fields, and rejects invalid categories with 400).
+    /// </summary>
+    public async Task<InworldVoice> UpdateVoiceAsync(
+        string apiKey, string voiceId, UpdateVoiceRequest update, CancellationToken ct = default)
+    {
+        // Build updateMask (snake_case) from whichever fields are set.
+        var mask = new List<string>();
+        if (update.DisplayName is not null) mask.Add("display_name");
+        if (update.Description is not null) mask.Add("description");
+        if (update.Tags        is not null) mask.Add("tags");
+        if (update.Gender      is not null) mask.Add("gender");
+        if (update.AgeGroup    is not null) mask.Add("age_group");
+        if (update.Categories  is not null) mask.Add("categories");
+
+        var path = $"/voices/v1/voices/{Uri.EscapeDataString(voiceId)}";
+        if (mask.Count > 0)
+            path += $"?updateMask={Uri.EscapeDataString(string.Join(",", mask))}";
+
+        var json    = JsonSerializer.Serialize(update, JsonOpts);
+        var request = BuildRequest(HttpMethod.Patch, path, apiKey);
+        request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await SendAsync(request, ct);
+        var body     = await response.Content.ReadAsStringAsync(ct);
+
+        // Response is the voice resource (occasionally wrapped in "voice").
+        using var doc = System.Text.Json.JsonDocument.Parse(body);
+        var voiceElem = doc.RootElement.TryGetProperty("voice", out var v) ? v : doc.RootElement;
+        return JsonSerializer.Deserialize<InworldVoice>(voiceElem.GetRawText(), JsonOpts)
+            ?? throw new InworldApiException("Invalid response from voice update API", 500);
     }
 
     // ── Voice Design ──────────────────────────────────────────────────────

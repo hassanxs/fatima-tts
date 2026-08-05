@@ -71,6 +71,28 @@
                 <TextBlock Text="* Credits saved = characters from resumed chunks not re-billed"
                            Style="{StaticResource TextMuted}" Margin="0,4,0,20"/>
 
+                <!-- Usage &amp; billing -->
+                <TextBlock Text="USAGE &amp; BILLING" Style="{StaticResource SectionLabel}"/>
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,24" Padding="16">
+                    <Grid>
+                        <StackPanel>
+                            <TextBlock x:Name="EstCostStat" Text="$0.00"
+                                       FontSize="24" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Estimated cost from characters actually billed by the API (all completed jobs)"
+                                       Style="{StaticResource TextMuted}" Margin="0,4,0,0"/>
+                            <TextBlock Text="Estimate only, at your configured prices — the Inworld Portal is the authoritative source."
+                                       Style="{StaticResource TextMuted}" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <Button x:Name="PortalUsageButton"
+                                Content="↗  View on Inworld Portal"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Height="34" Padding="14,0"
+                                Click="PortalUsage_Click"/>
+                    </Grid>
+                </Border>
+
                 <!-- Quick actions — directly under overview -->
                 <TextBlock Text="QUICK ACTIONS" Style="{StaticResource SectionLabel}"/>
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,24">

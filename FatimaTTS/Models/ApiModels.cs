@@ -25,6 +25,16 @@ public class InworldVoice
     [JsonPropertyName("isCustom")]
     public bool IsCustom { get; set; }
 
+    // Editable metadata (settable via UpdateVoice on cloned voices)
+    [JsonPropertyName("gender")]
+    public string? Gender { get; set; }
+
+    [JsonPropertyName("ageGroup")]
+    public string? AgeGroup { get; set; }
+
+    [JsonPropertyName("categories")]
+    public List<string> Categories { get; set; } = [];
+
     // Derived helpers
     public bool IsCloned => Source is "IVC" or "PVC";
     public bool IsSystem => Source == "SYSTEM";
@@ -58,6 +68,16 @@ public class SynthesizeSpeechRequest
 
     [JsonPropertyName("modelId")]
     public string ModelId { get; set; } = string.Empty;
+
+    // BCP-47 tag (e.g. "en-US"). Omitted when null — voice's own language is used.
+    [JsonPropertyName("language")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Language { get; set; }
+
+    // STABLE | BALANCED | CREATIVE (tts-2 steering). Omitted when null.
+    [JsonPropertyName("deliveryMode")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? DeliveryMode { get; set; }
 
     [JsonPropertyName("audioConfig")]
     public AudioConfig? AudioConfig { get; set; }
@@ -100,6 +120,9 @@ public class TimestampInfo
 {
     [JsonPropertyName("wordAlignment")]
     public WordAlignment? WordAlignment { get; set; }
+
+    [JsonPropertyName("characterAlignment")]
+    public CharacterAlignment? CharacterAlignment { get; set; }
 }
 
 public class WordAlignment
@@ -112,6 +135,18 @@ public class WordAlignment
 
     [JsonPropertyName("wordEndTimeSeconds")]
     public List<double> WordEndTimeSeconds { get; set; } = [];
+}
+
+public class CharacterAlignment
+{
+    [JsonPropertyName("characters")]
+    public List<string> Characters { get; set; } = [];
+
+    [JsonPropertyName("characterStartTimeSeconds")]
+    public List<double> CharacterStartTimeSeconds { get; set; } = [];
+
+    [JsonPropertyName("characterEndTimeSeconds")]
+    public List<double> CharacterEndTimeSeconds { get; set; } = [];
 }
 
 public class UsageInfo
@@ -219,4 +254,33 @@ public class PublishVoiceRequest
 
     [JsonPropertyName("tags")]
     public List<string>? Tags { get; set; }
+}
+
+// PATCH /voices/v1/voices/{voiceId} — partial update; only non-null fields are sent
+// and their snake_case names are added to the updateMask query param by the service.
+public class UpdateVoiceRequest
+{
+    [JsonPropertyName("displayName")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? DisplayName { get; set; }
+
+    [JsonPropertyName("description")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Description { get; set; }
+
+    [JsonPropertyName("tags")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<string>? Tags { get; set; }
+
+    [JsonPropertyName("gender")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Gender { get; set; }
+
+    [JsonPropertyName("ageGroup")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? AgeGroup { get; set; }
+
+    [JsonPropertyName("categories")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<string>? Categories { get; set; }
 }

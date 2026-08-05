@@ -17,7 +17,10 @@ namespace FatimaTTS.Services;
 /// </summary>
 public partial class ChunkingEngine
 {
-    private const int MaxChunkSize = 2000;
+    // Inworld's hard per-request limit is 2000 chars; we split at 1900 for a safety
+    // margin (matches Inworld's own reference chunker MAX_CHUNK_SIZE) so text normalization
+    // or trailing punctuation can't nudge a chunk over the limit.
+    private const int MaxChunkSize = 1900;
 
     // Regex: sentence-ending punctuation followed by whitespace/newline
     [GeneratedRegex(@"[.!?]+[\s\n]", RegexOptions.Compiled)]
@@ -28,7 +31,7 @@ public partial class ChunkingEngine
     private static partial Regex ClauseBoundaryRegex();
 
     /// <summary>
-    /// Splits text into chunks of at most 2000 characters, choosing split points
+    /// Splits text into chunks of at most 1900 characters, choosing split points
     /// that preserve word and sentence boundaries wherever possible.
     /// </summary>
     public IReadOnlyList<string> ChunkText(string text)

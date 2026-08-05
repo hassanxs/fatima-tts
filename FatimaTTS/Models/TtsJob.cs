@@ -31,6 +31,10 @@ public class TtsJob
     public string? BatchName { get; set; }  // set for jobs created by batch generation
     public double Temperature { get; set; } = 1.1;
     public double SpeakingRate { get; set; } = 1.0;
+    public string? Language { get; set; }                       // BCP-47, null = voice default
+    public string? DeliveryMode { get; set; }                   // STABLE|BALANCED|CREATIVE, null = unspecified
+    public string TimestampType { get; set; } = "WORD";         // WORD | CHARACTER
+    public string ApplyTextNormalization { get; set; } = "ON";  // ON | OFF
     public JobStatus Status { get; set; } = JobStatus.Pending;
     public int Progress { get; set; } = 0;
     public string? ErrorMessage { get; set; }
@@ -95,10 +99,19 @@ public class TtsChunk
     public int RetryCount { get; set; } = 0;
     public int ApiProcessedChars { get; set; }
     public DateTime? CompletedAt { get; set; }
-    public double ChunkTimeOffset { get; set; } = 0; // seconds offset from start of full audio
+    public double ChunkTimeOffset { get; set; } = 0; // legacy: absolute offset (pre-1.2.0 jobs)
+    public double DurationSeconds { get; set; } = 0; // this chunk's own span (for cumulative SRT offset)
+    // v1.2.0+ stores chunk-relative timings and applies the offset at SRT time.
+    // Pre-1.2.0 jobs deserialize this as false (their stored timings are already absolute).
+    public bool TimestampsAreRelative { get; set; } = false;
     public List<string> Words { get; set; } = [];
     public List<double> WordStartTimes { get; set; } = [];
     public List<double> WordEndTimes { get; set; } = [];
+
+    // Character-level alignment (populated when TimestampType == CHARACTER), offset-adjusted
+    public List<string> Characters { get; set; } = [];
+    public List<double> CharStartTimes { get; set; } = [];
+    public List<double> CharEndTimes { get; set; } = [];
 
     public const int MaxRetries = 2;
     public bool CanRetry => RetryCount < MaxRetries;

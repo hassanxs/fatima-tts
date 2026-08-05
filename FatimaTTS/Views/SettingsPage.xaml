@@ -216,6 +216,77 @@
                                 Minimum="0.5" Maximum="1.5" Value="1.0"
                                 TickFrequency="0.1" IsSnapToTickEnabled="True"
                                 ValueChanged="DefaultRateSlider_ValueChanged"/>
+
+                        <TextBlock Text="Default Language"
+                                   FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   Margin="0,14,0,6"/>
+                        <ComboBox x:Name="DefaultLanguageCombo"
+                                  Style="{StaticResource ComboStyle}" Margin="0,0,0,14"/>
+
+                        <TextBlock Text="Default Delivery Mode (steering)"
+                                   FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   Margin="0,0,0,6"/>
+                        <ComboBox x:Name="DefaultDeliveryModeCombo"
+                                  Style="{StaticResource ComboStyle}" Margin="0,0,0,14"/>
+
+                        <TextBlock Text="Default Subtitle Timestamps"
+                                   FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   Margin="0,0,0,6"/>
+                        <ComboBox x:Name="DefaultTimestampTypeCombo"
+                                  Style="{StaticResource ComboStyle}" Margin="0,0,0,14"/>
+
+                        <CheckBox x:Name="DefaultNormalizationCheck"
+                                  Content="Apply text normalization by default"
+                                  Foreground="{DynamicResource TextSecondaryBrush}"
+                                  FontSize="12" Margin="0,0,0,14"/>
+
+                        <Grid Margin="0,0,0,4">
+                            <TextBlock Text="Parallel Chunk Requests"
+                                       FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock x:Name="MaxParallelValue"
+                                       Style="{StaticResource TextSecondary}"
+                                       HorizontalAlignment="Right"/>
+                        </Grid>
+                        <TextBlock Text="How many chunks to synthesize at once. Keep at or below your Inworld plan's concurrency limit (On-Demand = 5)."
+                                   Style="{StaticResource TextMuted}"
+                                   TextWrapping="Wrap" Margin="0,0,0,6"/>
+                        <Slider x:Name="MaxParallelSlider"
+                                Minimum="1" Maximum="8" Value="3"
+                                TickFrequency="1" IsSnapToTickEnabled="True"
+                                ValueChanged="MaxParallelSlider_ValueChanged"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- ── Pricing ── -->
+                <TextBlock Text="PRICING (COST ESTIMATES)" Style="{StaticResource SectionLabel}"/>
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20" Padding="16">
+                    <StackPanel>
+                        <TextBlock Text="Price per 1,000,000 characters (USD) for each model. Used for the pre-generation cost estimate and the dashboard. Defaults are Inworld On-Demand rates — adjust to match your plan."
+                                   Style="{StaticResource TextMuted}"
+                                   TextWrapping="Wrap" Margin="0,0,0,12"/>
+
+                        <Grid Margin="0,0,0,10">
+                            <TextBlock Text="Inworld TTS 2" VerticalAlignment="Center"
+                                       FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBox x:Name="PriceTts2Box" Style="{StaticResource InputStyle}"
+                                     Width="120" Height="32" HorizontalAlignment="Right"/>
+                        </Grid>
+                        <Grid Margin="0,0,0,10">
+                            <TextBlock Text="Inworld TTS 1.5 Max" VerticalAlignment="Center"
+                                       FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBox x:Name="PriceMaxBox" Style="{StaticResource InputStyle}"
+                                     Width="120" Height="32" HorizontalAlignment="Right"/>
+                        </Grid>
+                        <Grid>
+                            <TextBlock Text="Inworld TTS 1.5 Mini" VerticalAlignment="Center"
+                                       FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBox x:Name="PriceMiniBox" Style="{StaticResource InputStyle}"
+                                     Width="120" Height="32" HorizontalAlignment="Right"/>
+                        </Grid>
                     </StackPanel>
                 </Border>
 

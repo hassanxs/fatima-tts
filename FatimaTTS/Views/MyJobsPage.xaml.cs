@@ -154,7 +154,7 @@ public partial class MyJobsPage : Page
 
         PlayerSrtButton.Tag        = job.Id;
         PlayerSaveButton.Tag       = job.Id;
-        PlayerSrtButton.Visibility = job.Chunks.Any(c => c.Words.Count > 0)
+        PlayerSrtButton.Visibility = SrtExportService.HasWordData(job)
             ? Visibility.Visible : Visibility.Collapsed;
 
         // Draw waveform asynchronously so UI doesn't block
@@ -293,20 +293,22 @@ public partial class MyJobsPage : Page
         var job   = _allJobs.FirstOrDefault(j => j.Id == jobId);
         if (job is null) return;
 
-        var hasTimestamps = job.Chunks.Any(c => c.Words.Count > 0);
-        if (!hasTimestamps)
+        if (!SrtExportService.HasWordData(job))
         {
-            MessageBox.Show("No word timestamp data available for this job.\n\nSRT export requires generation with Inworld TTS 1.5 Max or Mini.",
+            MessageBox.Show("No timestamp data available for this job.\n\nSRT export requires generation with a timestamp-capable model.",
                 "No Timestamps", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
+        var hasChar     = SrtExportService.HasCharData(job);
         var defaultName = System.IO.Path.GetFileNameWithoutExtension(job.OutputFileName ?? "audio") + ".srt";
         var dlg = new Microsoft.Win32.SaveFileDialog
         {
             Title = "Export SRT Subtitle File",
             FileName = defaultName,
-            Filter = "SRT subtitle files|*.srt|All files|*.*",
+            Filter = hasChar
+                ? "Word-level SRT|*.srt|Character-level SRT|*.srt|All files|*.*"
+                : "SRT subtitle files|*.srt|All files|*.*",
             DefaultExt = "srt"
         };
 
@@ -314,7 +316,8 @@ public partial class MyJobsPage : Page
         {
             try
             {
-                _srtExport.ExportSrt(job, dlg.FileName);
+                bool charLevel = hasChar && dlg.FilterIndex == 2;
+                _srtExport.ExportSrt(job, dlg.FileName, charLevel);
                 MessageBox.Show($"SRT exported successfully.", "Export Complete",
                     MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -434,7 +437,7 @@ public class JobViewModel
     public string CreatedAtLabel => _job.CreatedAt.ToString("MMM d, yyyy h:mm tt");
     public string? ErrorMessage  => _job.ErrorMessage;
     public int    ResumeFrom     => _job.ResumeFromChunkIndex + 1;
-    public bool   HasSrt         => _job.Chunks.Any(c => c.Words.Count > 0);
+    public bool   HasSrt         => SrtExportService.HasWordData(_job);
 
     public Visibility HasError    => string.IsNullOrWhiteSpace(_job.ErrorMessage)
         ? Visibility.Collapsed : Visibility.Visible;

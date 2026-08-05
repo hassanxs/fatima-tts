@@ -22,3 +22,7 @@ desktop.ini
 appsettings.Development.json
 *.pfx
 *.p12
+
+## Local Claude Code tooling — not part of the project
+CLAUDE.md
+.claude/
