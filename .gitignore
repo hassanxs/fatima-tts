@@ -8,9 +8,10 @@ publish/
 *.nupkg
 
 ## Build artifacts
-installer/*.msi
-installer/*.wixpdb
 dist/
+
+## Installer / WiX setup
+installer/
 
 ## OS
 Thumbs.db
