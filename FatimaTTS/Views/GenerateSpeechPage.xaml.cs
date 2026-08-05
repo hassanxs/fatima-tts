@@ -23,7 +23,7 @@ public partial class GenerateSpeechPage : Page
     private readonly SrtExportService       _srtExport;
 
     private List<InworldVoice> _voices = [];
-    private string   _selectedModelId  = "inworld-tts-1.5-max";
+    private string   _selectedModelId  = AppSettings.DefaultModel;
     private TtsJob?  _currentJob;
     private CancellationTokenSource? _cts;
     private float[]  _waveformData     = [];
@@ -302,7 +302,7 @@ public partial class GenerateSpeechPage : Page
 
     private void SetModelRadio(string modelId)
     {
-        foreach (var rb in new[] { ModelRadio1, ModelRadio2, ModelRadio3, ModelRadio4 })
+        foreach (var rb in new[] { ModelRadio1, ModelRadio2, ModelRadio3 })
         {
             if (rb.Tag?.ToString() == modelId)
             {

@@ -438,14 +438,14 @@
                         <RadioButton x:Name="ModelRadio1"
                                      Style="{StaticResource ModelRadioStyle}"
                                      GroupName="ModelGroup"
-                                     Tag="inworld-tts-1.5-max"
+                                     Tag="inworld-tts-2"
                                      IsChecked="True"
                                      Checked="ModelRadio_Checked">
                             <StackPanel>
-                                <TextBlock Text="Inworld TTS 1.5 Max"
+                                <TextBlock Text="Inworld TTS 2"
                                            FontSize="13" FontWeight="SemiBold"
                                            Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                <TextBlock Text="Flagship model — best quality + speed balance"
+                                <TextBlock Text="Flagship model — natural-language steering, ~120ms latency, 200+ languages"
                                            FontSize="11"
                                            Foreground="{DynamicResource TextMutedBrush}"
                                            Margin="0,2,0,0"/>
@@ -455,13 +455,13 @@
                         <RadioButton x:Name="ModelRadio2"
                                      Style="{StaticResource ModelRadioStyle}"
                                      GroupName="ModelGroup"
-                                     Tag="inworld-tts-1.5-mini"
+                                     Tag="inworld-tts-1.5-max"
                                      Checked="ModelRadio_Checked">
                             <StackPanel>
-                                <TextBlock Text="Inworld TTS 1.5 Mini"
+                                <TextBlock Text="Inworld TTS 1.5 Max"
                                            FontSize="13" FontWeight="SemiBold"
                                            Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                <TextBlock Text="Ultra-fast, most cost-efficient (~120ms latency)"
+                                <TextBlock Text="High quality, optimized for stability with enhanced timestamps"
                                            FontSize="11"
                                            Foreground="{DynamicResource TextMutedBrush}"
                                            Margin="0,2,0,0"/>
@@ -471,29 +471,13 @@
                         <RadioButton x:Name="ModelRadio3"
                                      Style="{StaticResource ModelRadioStyle}"
                                      GroupName="ModelGroup"
-                                     Tag="inworld-tts-1-max"
+                                     Tag="inworld-tts-1.5-mini"
                                      Checked="ModelRadio_Checked">
                             <StackPanel>
-                                <TextBlock Text="Inworld TTS 1.0 Max"
+                                <TextBlock Text="Inworld TTS 1.5 Mini"
                                            FontSize="13" FontWeight="SemiBold"
                                            Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                <TextBlock Text="Previous gen — powerful with basic timestamps"
-                                           FontSize="11"
-                                           Foreground="{DynamicResource TextMutedBrush}"
-                                           Margin="0,2,0,0"/>
-                            </StackPanel>
-                        </RadioButton>
-
-                        <RadioButton x:Name="ModelRadio4"
-                                     Style="{StaticResource ModelRadioStyle}"
-                                     GroupName="ModelGroup"
-                                     Tag="inworld-tts-1"
-                                     Checked="ModelRadio_Checked">
-                            <StackPanel>
-                                <TextBlock Text="Inworld TTS 1.0"
-                                           FontSize="13" FontWeight="SemiBold"
-                                           Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                <TextBlock Text="Previous gen — fastest with basic timestamps"
+                                <TextBlock Text="Most cost-efficient, ideal for English workloads"
                                            FontSize="11"
                                            Foreground="{DynamicResource TextMutedBrush}"
                                            Margin="0,2,0,0"/>
