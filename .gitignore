@@ -10,6 +10,7 @@ publish/
 ## Build artifacts
 installer/*.msi
 installer/*.wixpdb
+dist/
 
 ## OS
 Thumbs.db
@@ -20,5 +21,3 @@ desktop.ini
 appsettings.Development.json
 *.pfx
 *.p12
-
-installer/

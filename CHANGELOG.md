@@ -1,5 +1,20 @@
 # Changelog
 
+## v1.1.0
+
+### Changed
+- Updated the Inworld TTS model list to the current catalog:
+  - Added the new flagship **Inworld TTS 2** (`inworld-tts-2`) — natural-language steering, ~120ms latency, 200+ languages — and made it the default for new installs.
+  - Removed the discontinued `inworld-tts-1` and `inworld-tts-1-max` (retired by Inworld on 2026-06-15).
+  - Current models: `inworld-tts-2`, `inworld-tts-1.5-max`, `inworld-tts-1.5-mini`.
+- Older `settings.json` files that reference a removed model are now migrated automatically to its 1.5 successor; existing valid model choices are preserved.
+
+### Verify your download
+```powershell
+Get-FileHash "FatimaTTS-v1.1.0-installer.msi" -Algorithm SHA256
+```
+Compare the output with `SHA256SUMS.txt` attached to this release.
+
 ## v1.0.0 — Initial Release
 
 ### Verify your download

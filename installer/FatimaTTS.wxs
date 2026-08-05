@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Fatima TTS installer (WiX v5).
+
+  Build (from repo root) with the helper script:
+      installer/build-installer.ps1 -Version 1.1.0
+
+  UpgradeCode is FIXED for the life of the product — never change it, or
+  future installers will no longer upgrade earlier versions in place.
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+
+  <Package Name="Fatima TTS"
+           Manufacturer="Hassan Latif"
+           Version="$(var.Version)"
+           UpgradeCode="2BE96812-9914-4A41-9DCE-D16EF00D071F"
+           Scope="perMachine"
+           Compressed="yes">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Fatima TTS is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Icon Id="AppIcon" SourceFile="$(var.IconFile)" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/hassanxs/fatima-tts" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/hassanxs/fatima-tts" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="Fatima TTS" />
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ShortcutFolder" Name="Fatima TTS" />
+    </StandardDirectory>
+
+    <ComponentGroup Id="AppComponents" Directory="INSTALLFOLDER">
+      <Component Id="MainExecutable">
+        <File Id="FatimaTTSExe" Source="$(var.PublishDir)\FatimaTTS.exe" KeyPath="yes">
+          <Shortcut Id="StartMenuShortcut"
+                    Directory="ShortcutFolder"
+                    Name="Fatima TTS"
+                    WorkingDirectory="INSTALLFOLDER"
+                    Icon="AppIcon"
+                    Advertise="yes" />
+        </File>
+        <RemoveFolder Id="RemoveShortcutFolder" Directory="ShortcutFolder" On="uninstall" />
+      </Component>
+
+      <Component Id="Lib_D3DCompiler">
+        <File Source="$(var.PublishDir)\D3DCompiler_47_cor3.dll" />
+      </Component>
+      <Component Id="Lib_PenImc">
+        <File Source="$(var.PublishDir)\PenImc_cor3.dll" />
+      </Component>
+      <Component Id="Lib_PresentationNative">
+        <File Source="$(var.PublishDir)\PresentationNative_cor3.dll" />
+      </Component>
+      <Component Id="Lib_VcRuntime">
+        <File Source="$(var.PublishDir)\vcruntime140_cor3.dll" />
+      </Component>
+      <Component Id="Lib_WpfGfx">
+        <File Source="$(var.PublishDir)\wpfgfx_cor3.dll" />
+      </Component>
+    </ComponentGroup>
+
+    <Feature Id="Main" Title="Fatima TTS" Level="1">
+      <ComponentGroupRef Id="AppComponents" />
+    </Feature>
+
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.LicenseRtf)" />
+
+  </Package>
+</Wix>
