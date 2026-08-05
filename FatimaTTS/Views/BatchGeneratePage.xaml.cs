@@ -445,7 +445,7 @@ public partial class BatchGeneratePage : Page
         }
 
         var voiceId  = GetComboTag(VoiceComboBox);
-        var modelId  = GetComboTag(ModelComboBox) ?? "inworld-tts-1.5-max";
+        var modelId  = GetComboTag(ModelComboBox) ?? AppSettings.DefaultModel;
         var encoding = GetComboTag(FormatComboBox) ?? "MP3";
         var rateStr  = GetComboTag(SpeakingRateComboBox) ?? "1.0";
         double.TryParse(rateStr, System.Globalization.NumberStyles.Any,

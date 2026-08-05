@@ -205,7 +205,7 @@ public partial class SettingsPage : Page
 
         settings.Theme                = ThemeDark.IsChecked == true ? "Dark" : "Light";
         settings.DefaultAudioEncoding = GetComboTag(DefaultFormatCombo) ?? "MP3";
-        settings.DefaultModelId       = GetComboTag(DefaultModelCombo)  ?? "inworld-tts-1.5-max";
+        settings.DefaultModelId       = GetComboTag(DefaultModelCombo)  ?? AppSettings.DefaultModel;
         settings.DefaultTemperature   = DefaultTempSlider.Value;
         settings.DefaultSpeakingRate  = DefaultRateSlider.Value;
         settings.OutputFolder         = OutputFolderBox.Text.Trim();

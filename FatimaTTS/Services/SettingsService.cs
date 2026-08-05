@@ -24,7 +24,12 @@ public class SettingsService
                 return new AppSettings();
 
             var json = File.ReadAllText(SettingsPath);
-            return JsonSerializer.Deserialize<AppSettings>(json, JsonOpts) ?? new AppSettings();
+            var settings = JsonSerializer.Deserialize<AppSettings>(json, JsonOpts) ?? new AppSettings();
+
+            // Migrate discontinued/unknown model IDs from older settings files.
+            settings.DefaultModelId = AppSettings.NormalizeModelId(settings.DefaultModelId);
+
+            return settings;
         }
         catch
         {
